@@ -1,2 +1,3 @@
-# creek-service-metadata
-Aggregate and Service metadata types
+# creek-core
+
+The core of the Creek system
