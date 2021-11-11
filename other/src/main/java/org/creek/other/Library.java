@@ -6,10 +6,20 @@ public class Library {
     }
 
     public boolean someOtherLibraryMethod() {
-        if (System.currentTimeMillis() % 10000 == 0) {
+
+        final String willNotFindMe = System.getenv("WillNotFindMe");
+        final String willNotFindMeEither = System.getenv("WillNotFindMeEither");
+        System.out.println("Just adding some more lines");
+        if (willNotFindMe == null) {
+            System.out.println("Well this is unexpected");
+        }
+        if (willNotFindMe != null) {
             return true;
         }
-        if (System.getenv("WillNotFindMe") == null) {
+        if (willNotFindMeEither == null) {
+            System.out.println("Well this is unexpected");
+        }
+        if (willNotFindMeEither == null) {
             return true;
         }
         return true;
