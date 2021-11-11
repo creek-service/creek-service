@@ -9,7 +9,7 @@ public class Library {
         if (System.currentTimeMillis() % 10000 == 0) {
             return true;
         }
-        if (System.currentTimeMillis() % 50 == 0) {
+        if (System.getenv("WillNotFindMe") == null) {
             return true;
         }
         return true;
