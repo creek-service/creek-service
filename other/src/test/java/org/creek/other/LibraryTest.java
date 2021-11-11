@@ -11,4 +11,10 @@ class LibraryTest {
         final Library classUnderTest = new Library();
         assertThat(classUnderTest.someLibraryMethod(), is(true));
     }
+
+    @Test
+    void someOther() {
+        final Library classUnderTest = new Library();
+        assertThat(classUnderTest.someOtherLibraryMethod(), is(true));
+    }
 }
