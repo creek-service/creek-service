@@ -6,11 +6,6 @@ public class Library {
     }
 
     public boolean someOtherLibraryMethod() {
-        final String willNotFindMe = System.getenv("WillNotFindMe");
-        System.out.println("Just adding some more lines");
-        if (willNotFindMe != null) {
-            return true;
-        }
         return true;
     }
 }

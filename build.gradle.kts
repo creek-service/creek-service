@@ -116,27 +116,6 @@ subprojects {
         dependsOn(tasks.test)
     }
 
-//    tasks.jacocoTestCoverageVerification {
-//        dependsOn(tasks.test)
-//
-//        violationRules {
-//            rule {
-//                limit {
-//                    counter = "LINE"
-//                    minimum = 0.80.toBigDecimal()
-//                }
-//                limit {
-//                    counter = "BRANCH"
-//                    minimum = 0.80.toBigDecimal()
-//                }
-//            }
-//        }
-//    }
-
-//    tasks.check{
-//        dependsOn(tasks.jacocoTestCoverageVerification)
-//    }
-
     tasks.jar {
         archiveBaseName.set("creek-${project.name}")
     }

@@ -26,9 +26,14 @@ Contribution welcome!
 
 ## Submit Changes
 
-* Before submitting, ensure your code is correctly formatted, and passes all requirements, by running:
-  * `./gradle format check`
+* Before submitting run `./gradlew format check`:
+  * Running `./gradlew format` will ensure the code is correctly formatted. 
+  * Running `./gradlew static` will run static code analysis.
+  * Running `./gradlew test` will run all the tests.
+  * Running `./gradlew coverage` will produce a code coverage report in 
+    [`<project-roo>/build/reports/jacoco/coverage/html/index.html>`](build/reports/jacoco/coverage/html/index.html)
 * Push your changes to a feature branch in your fork of the repository.
 * [Open a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) to merge the changes from your branch into the main branch.
 * Please reference the Github issue number in your pull request. 
+* Ensure all checks pass on the pull request.
 
