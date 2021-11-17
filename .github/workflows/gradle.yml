@@ -27,7 +27,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: ./gradlew check coveralls
+    - name: List tags
+      run: git tag
     - name: Publish
       if: github.event_name == 'push'
-      run: ./gradlew --stacktrace -i release
+      run: ./gradlew release
 
