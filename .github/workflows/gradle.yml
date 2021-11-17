@@ -28,7 +28,7 @@ jobs:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: ./gradlew check coveralls
     - name: List tags
-      run: git tag
+      run: /usr/bin/git tag
     - name: Publish
       if: github.event_name == 'push'
       run: ./gradlew release
