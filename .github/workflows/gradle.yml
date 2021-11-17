@@ -30,6 +30,7 @@ jobs:
     - name: Publish
       if: github.event_name == 'push'
       run: |
-        git fetch --tags
+        git fetch --tags --unshallow
+        git tag --list
         ./gradlew release
 
