@@ -1,6 +1,5 @@
 rootProject.name = "creek-core"
 
 include(
-    "service-metadata",
-    "other"
+    "service-metadata"
 )
