@@ -1,4 +1,4 @@
-rootProject.name = "creek"
+rootProject.name = "creek-core"
 
 include(
     "service-metadata",
