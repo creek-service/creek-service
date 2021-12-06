@@ -1,6 +1,7 @@
 plugins {
     java
     jacoco
+    `maven-publish`
     id("com.github.spotbugs") version "4.7.0"                   // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-gradle-plugin
     id("com.diffplug.spotless") version "6.0.0"                 // https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-plugin-gradle
     id("pl.allegro.tech.build.axion-release") version "1.13.6"  // https://mvnrepository.com/artifact/pl.allegro.tech.build.axion-release/pl.allegro.tech.build.axion-release.gradle.plugin?repo=gradle-plugins
@@ -28,6 +29,14 @@ allprojects {
 
     repositories {
         mavenCentral()
+
+        maven {
+            url = uri("https://maven.pkg.github.com/creek-service/*")
+            credentials {
+                username = "Creek-Bot-Token"
+                password = "\u0067hp_LtyvXrQZen3WlKenUhv21Mg6NG38jn0AO2YH"
+            }
+        }
     }
 }
 
@@ -120,21 +129,34 @@ subprojects {
         archiveBaseName.set("creek-${project.name}")
     }
 
-    configure<PublishingExtension> {
-        publications {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-                artifactId = "creek-${project.name}"
-            }
-        }
-    }
-
     tasks.register("format") {
         dependsOn("spotlessCheck", "spotlessApply")
     }
 
     tasks.register("static") {
         dependsOn("checkstyleMain", "checkstyleTest", "spotbugsMain", "spotbugsTest")
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/creek-service/${rootProject.name}")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+
+                pom {
+                    url.set("https://github.com/creek-service/${rootProject.name}.git")
+                }
+            }
+        }
     }
 }
 
@@ -179,4 +201,4 @@ tasks.coveralls {
     onlyIf{System.getenv("CI") != null}
 }
 
-defaultTasks("check")
+defaultTasks("format", "static", "check")
