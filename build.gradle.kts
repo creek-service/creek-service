@@ -5,7 +5,7 @@ plugins {
     id("com.github.spotbugs") version "4.7.0"                   // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-gradle-plugin
     id("com.diffplug.spotless") version "6.0.0"                 // https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-plugin-gradle
     id("pl.allegro.tech.build.axion-release") version "1.13.6"  // https://mvnrepository.com/artifact/pl.allegro.tech.build.axion-release/pl.allegro.tech.build.axion-release.gradle.plugin?repo=gradle-plugins
-    id("com.github.kt3k.coveralls") version "2.12.0"             // https://plugins.gradle.org/plugin/com.github.kt3k.coveralls
+    id("com.github.kt3k.coveralls") version "2.12.0"            // https://plugins.gradle.org/plugin/com.github.kt3k.coveralls
 }
 
 project.version = scmVersion.version
@@ -51,9 +51,9 @@ subprojects {
         set("guavaVersion", "31.0.1-jre")       // https://mvnrepository.com/artifact/com.google.guava/guava
         set("log4jVersion", "2.14.1")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
 
-        set("junitVersion", "5.8.1")            // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-        set("junitPioneerVersion", "1.4.2")     // https://mvnrepository.com/artifact/org.junit-pioneer/junit-pioneer
-        set("mockitoVersion", "4.0.0")          // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
+        set("junitVersion", "5.8.2")            // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+        set("junitPioneerVersion", "1.5.0")     // https://mvnrepository.com/artifact/org.junit-pioneer/junit-pioneer
+        set("mockitoVersion", "4.1.0")          // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
         set("hamcrestVersion", "2.2")           // https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core
     }
 
@@ -126,7 +126,7 @@ subprojects {
     }
 
     tasks.jar {
-        archiveBaseName.set("creek-${project.name}")
+        archiveBaseName.set("${rootProject.name}-${project.name}")
     }
 
     tasks.register("format") {
@@ -151,6 +151,7 @@ subprojects {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
+                artifactId = "${rootProject.name}-${project.name}"
 
                 pom {
                     url.set("https://github.com/creek-service/${rootProject.name}.git")
@@ -171,9 +172,8 @@ val coverage = tasks.register<JacocoReport>("coverage") {
         val subproject = this
         subproject.plugins.withType<JacocoPlugin>().configureEach {
             subproject.tasks.matching({ it.extensions.findByType<JacocoTaskExtension>() != null }).configureEach {
-                val coverageSubTask = this
                 sourceSets(subproject.sourceSets.main.get())
-                executionData(coverageSubTask)
+                executionData(files(subproject.tasks.withType<Test>()).filter { it.exists() && it.name.endsWith(".exec") })
             }
 
             subproject.tasks.matching({ it.extensions.findByType<JacocoTaskExtension>() != null }).forEach {
