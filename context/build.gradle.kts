@@ -3,4 +3,5 @@ plugins {
 }
 
 dependencies {
+    api("org.creek:creek-platform-metadata:+")
 }

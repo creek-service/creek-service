@@ -18,7 +18,7 @@ allprojects {
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "com.github.spotbugs")
 
-    group = "org.creek.core"
+    group = "org.creek"
 
     java {
         withSourcesJar()
