@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Creek Contributors (https://github.com/creek-service)
+ * Copyright 2022 Creek Contributors (https://github.com/creek-service)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,13 @@ package org.creek.api.service.extension;
 
 /**
  * Base type for extensions to Creek.
+ *
+ * <p>An extension is instantiated by an {@link CreekExtensionBuilder}.
  */
 public interface CreekExtension {
+
+    /**
+     * @return the name of the extension.
+     */
+    String name();
 }

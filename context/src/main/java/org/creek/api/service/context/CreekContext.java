@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package org.creek;
+package org.creek.api.service.context;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Test;
+import org.creek.api.service.extension.CreekExtension;
 
-class LibraryTest {
-    @Test
-    void someLibraryMethodReturnsTrue() {
-        final Library classUnderTest = new Library();
-        assertThat(classUnderTest.someLibraryMethod(), is(true));
-    }
+/** One-stop shop for access to Creek functionality. */
+public interface CreekContext {
+
+    /**
+     * Get access to one of the installed Creek extensions.
+     *
+     * @param extensionType the type of the extension.
+     * @param <T> the type of the extension.
+     * @return the extension, if installed
+     * @throws IllegalArgumentException if not installed.
+     */
+    <T extends CreekExtension> T extension(Class<T> extensionType);
 }

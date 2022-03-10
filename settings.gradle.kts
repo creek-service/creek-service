@@ -1,5 +1,9 @@
 rootProject.name = "creek-service"
 
 include(
-    "context"
+    "extension",
+    "extension-test",
+    "context",
+    "test-java-eight-extension",
+    "test-java-nine-extension"
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Creek Contributors (https://github.com/creek-service)
+ * Copyright 2022 Creek Contributors (https://github.com/creek-service)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-package org.creek.api.service;
+package org.creek.api.service.extension;
 
-import org.creek.api.service.extension.CreekExtension;
-
-/**
- * One-stop shop for access to Creek functionality.
- */
-public interface CreekContext {
-
-    <T extends CreekExtension> T extension(final Class<T> extensionType);
-}
+/** Marker interface for extension option types. */
+public interface CreekExtensionOptions {}
