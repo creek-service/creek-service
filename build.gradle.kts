@@ -2,7 +2,7 @@ plugins {
     java
     jacoco
     `maven-publish`
-    id("com.github.spotbugs") version "4.7.0"                   // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-gradle-plugin
+    id("com.github.spotbugs") version "5.0.6"                   // https://plugins.gradle.org/plugin/com.github.spotbugs
     id("com.diffplug.spotless") version "6.0.0"                 // https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-plugin-gradle
     id("pl.allegro.tech.build.axion-release") version "1.13.6"  // https://mvnrepository.com/artifact/pl.allegro.tech.build.axion-release/pl.allegro.tech.build.axion-release.gradle.plugin?repo=gradle-plugins
     id("com.github.kt3k.coveralls") version "2.12.0"            // https://plugins.gradle.org/plugin/com.github.kt3k.coveralls
@@ -14,11 +14,18 @@ project.version = scmVersion.version
 allprojects {
     apply(plugin = "idea")
     apply(plugin = "java")
-    apply(plugin = "jacoco")
     apply(plugin = "checkstyle")
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "com.github.spotbugs")
     apply(plugin = "org.javamodularity.moduleplugin")
+
+    configure(subprojects
+            // Exclude test modules from code coverage
+            - project(":test-java-eight-extension")
+            - project(":test-java-nine-extension")
+    ) {
+        apply(plugin = "jacoco")
+    }
 
     group = "org.creek"
 
@@ -50,7 +57,7 @@ subprojects {
 
     extra.apply {
         set("creekVersion", "+")
-        set("spotBugsVersion", "4.4.2")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+        set("spotBugsVersion", "4.6.0")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 
         set("log4jVersion", "2.14.1")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
         set("guavaVersion", "31.0.1-jre")       // https://mvnrepository.com/artifact/com.google.guava/guava
@@ -112,19 +119,19 @@ subprojects {
     spotbugs {
         tasks.spotbugsMain {
             reports.create("html") {
-                isEnabled = true
+                required.set(true)
                 setStylesheet("fancy-hist.xsl")
             }
         }
         tasks.spotbugsTest {
             reports.create("html") {
-                isEnabled = true
+                required.set(true)
                 setStylesheet("fancy-hist.xsl")
             }
         }
     }
 
-    tasks.jacocoTestReport {
+    tasks.withType<JacocoReport>().configureEach{
         dependsOn(tasks.test)
     }
 

@@ -47,8 +47,6 @@ public final class CreekServices {
     }
 
     public interface Builder {
-        // todo: way to customize clock.
-
         /**
          * Set extension options.
          *
@@ -61,5 +59,3 @@ public final class CreekServices {
         CreekContext build();
     }
 }
-
-// Todo: test

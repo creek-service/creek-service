@@ -1,0 +1,8 @@
+--add-modules
+  org.junitpioneer,org.hamcrest
+
+--add-reads
+  creek.service.context.test=org.junitpioneer,org.hamcrest
+
+--add-opens
+  org.junitpioneer/org.junitpioneer.jupiter=org.junit.platform.commons

@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package org.creek.test.java.eight.service.extension;
+package org.creek.test.java.nine.service.extension;
 
 
 import org.creek.api.platform.metadata.ComponentDescriptor;
+import org.creek.api.platform.metadata.ComponentInternal;
+import org.creek.api.platform.metadata.ComponentOutput;
 import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.extension.CreekExtension;
 import org.creek.api.service.extension.CreekExtensionBuilder;
 
-public class JavaEightExtensionBuilder implements CreekExtensionBuilder {
+public class JavaNineExtensionBuilder2 implements CreekExtensionBuilder {
 
-    private static final String NAME = "java8";
+    private static final String NAME = "java9_2";
 
     @Override
     public String name() {
@@ -33,7 +35,7 @@ public class JavaEightExtensionBuilder implements CreekExtensionBuilder {
 
     @Override
     public boolean accepts(final ResourceDescriptor resourceDef) {
-        return false;
+        return resourceDef instanceof Internal || resourceDef instanceof Output;
     }
 
     @Override
@@ -41,10 +43,14 @@ public class JavaEightExtensionBuilder implements CreekExtensionBuilder {
         return new Extension();
     }
 
-    private static final class Extension implements CreekExtension {
+    public static final class Extension implements CreekExtension {
         @Override
         public String name() {
             return NAME;
         }
     }
+
+    public static final class Internal implements ComponentInternal {}
+
+    public static final class Output implements ComponentOutput {}
 }

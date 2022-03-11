@@ -18,23 +18,44 @@ package org.creek.test.java.nine.service.extension;
 
 
 import org.creek.api.platform.metadata.ComponentDescriptor;
+import org.creek.api.platform.metadata.ComponentInput;
 import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.extension.CreekExtension;
 import org.creek.api.service.extension.CreekExtensionBuilder;
+import org.creek.api.service.extension.CreekExtensionOptions;
 
 public class JavaNineExtensionBuilder implements CreekExtensionBuilder {
+
+    private static final String NAME = "java9";
+
     @Override
     public String name() {
-        return "java9";
+        return NAME;
     }
 
     @Override
     public boolean accepts(final ResourceDescriptor resourceDef) {
-        return false;
+        return resourceDef instanceof Input;
+    }
+
+    @Override
+    public boolean with(final CreekExtensionOptions options) {
+        return options instanceof Options;
     }
 
     @Override
     public CreekExtension build(final ComponentDescriptor component) {
-        return null;
+        return new Extension();
     }
+
+    public static final class Extension implements CreekExtension {
+        @Override
+        public String name() {
+            return NAME;
+        }
+    }
+
+    public static final class Options implements CreekExtensionOptions {}
+
+    public static final class Input implements ComponentInput {}
 }
