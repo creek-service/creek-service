@@ -22,6 +22,8 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.creek.api.base.annotation.VisibleForTesting;
+import org.creek.api.base.type.temporal.AccurateClock;
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.observability.logging.structured.StructuredLogger;
 import org.creek.api.observability.logging.structured.StructuredLoggerFactory;
 import org.creek.api.platform.metadata.ComponentDescriptor;
@@ -100,7 +102,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
         final List<CreekExtension> extensions = initializeExtensions();
 
-        return contextFactory.build(extensions);
+        return contextFactory.build(AccurateClock.create(), extensions);
     }
 
     private void installDefaultUncaughtExceptionHandler() {
@@ -156,7 +158,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ContextFactory {
-        CreekContext build(List<CreekExtension> extensions);
+        CreekContext build(Clock clock, List<CreekExtension> extensions);
     }
 
     @VisibleForTesting

@@ -20,11 +20,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.service.extension.CreekExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,16 +40,22 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ContextTest {
 
+    @Mock private Clock clock;
     @Mock private TestExtension0 ext0;
     @Mock private TestExtension1 ext1;
     private Context ctx;
 
     @BeforeEach
     void setUp() {
-        ctx = new Context(List.of(ext0, ext1));
+        ctx = new Context(clock, List.of(ext0, ext1));
 
         when(ext0.name()).thenReturn("ext0");
         when(ext1.name()).thenReturn("ext1");
+    }
+
+    @Test
+    void shouldExposeClock() {
+        assertThat(ctx.clock(), is(sameInstance(clock)));
     }
 
     @Test
@@ -59,7 +67,8 @@ class ContextTest {
     @Test
     void shouldThrowMeaningfulExceptionIfTwoExtensionsHaveTheSameType() {
         // When:
-        final Exception e = assertThrows(Exception.class, () -> new Context(List.of(ext0, ext0)));
+        final Exception e =
+                assertThrows(Exception.class, () -> new Context(clock, List.of(ext0, ext0)));
 
         // Then:
         assertThat(

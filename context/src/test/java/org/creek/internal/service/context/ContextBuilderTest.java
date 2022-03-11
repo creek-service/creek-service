@@ -21,6 +21,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.when;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.stream.Stream;
+import org.creek.api.base.type.temporal.AccurateClock;
 import org.creek.api.platform.metadata.ComponentDescriptor;
 import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.context.CreekContext;
@@ -78,7 +81,7 @@ class ContextBuilderTest {
         when(extBuilder1.with(any())).thenReturn(true);
         when(extBuilder1.build(any())).thenReturn(ext1);
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
-        when(contextFactory.build(any())).thenReturn(ctx);
+        when(contextFactory.build(any(), any())).thenReturn(ctx);
 
         ctxBuilder = newContextBuilder();
     }
@@ -182,7 +185,7 @@ class ContextBuilderTest {
         final CreekContext result = ctxBuilder.build();
 
         // Then:
-        verify(contextFactory).build(List.of(ext0, ext1));
+        verify(contextFactory).build(isA(AccurateClock.class), eq(List.of(ext0, ext1)));
         assertThat(result, is(ctx));
     }
 

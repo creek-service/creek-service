@@ -23,14 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.service.context.CreekContext;
 import org.creek.api.service.extension.CreekExtension;
 
 final class Context implements CreekContext {
 
+    private final Clock clock;
     private final Map<Class<? extends CreekExtension>, CreekExtension> extensions;
 
-    Context(final List<CreekExtension> extensions) {
+    Context(final Clock clock, final List<CreekExtension> extensions) {
+        this.clock = requireNonNull(clock, "clock");
         this.extensions =
                 requireNonNull(extensions, "extensions").stream()
                         .collect(
@@ -38,6 +41,11 @@ final class Context implements CreekContext {
                                         CreekExtension::getClass,
                                         Function.identity(),
                                         Context::throwOnExtensionTypeClash));
+    }
+
+    @Override
+    public Clock clock() {
+        return clock;
     }
 
     @SuppressWarnings("unchecked")
