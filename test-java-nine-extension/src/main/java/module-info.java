@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Creek Contributors (https://github.com/creek-service)
+ * Copyright 2022 Creek Contributors (https://github.com/creek-service)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package org.creek;
 
-public class Library {
-    public boolean someLibraryMethod() {
-        return true;
-    }
+import org.creek.api.service.extension.CreekExtensionBuilder;
+import org.creek.test.java.nine.service.extension.JavaNineExtensionBuilder;
+import org.creek.test.java.nine.service.extension.JavaNineExtensionBuilder2;
+
+module creek.service.test.java.nine.extension {
+    requires transitive creek.service.extension;
+
+    exports org.creek.test.java.nine.service.extension;
+
+    provides CreekExtensionBuilder with
+            JavaNineExtensionBuilder,
+            JavaNineExtensionBuilder2;
 }
