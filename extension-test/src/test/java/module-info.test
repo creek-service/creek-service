@@ -6,3 +6,9 @@
 
 --add-opens
   org.junitpioneer/org.junitpioneer.jupiter=org.junit.platform.commons
+
+--add-opens
+  java.base/java.lang=org.junitpioneer
+
+--add-opens
+  java.base/java.util=org.junitpioneer

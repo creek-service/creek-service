@@ -20,11 +20,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import org.creek.api.base.type.temporal.AccurateClock;
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.platform.metadata.ComponentInput;
 import org.creek.api.platform.metadata.ServiceDescriptor;
 import org.creek.api.service.context.CreekContext;
@@ -55,6 +59,26 @@ class CreekServicesTest {
 
         when(serviceDescriptor.name()).thenReturn("the-service");
         when(serviceDescriptor.resources()).thenCallRealMethod();
+    }
+
+    @Test
+    void shouldExposeDefaultClock() {
+        // When:
+        final CreekContext ctx = CreekServices.context(serviceDescriptor);
+
+        // Then:
+        assertThat(ctx.clock(), is(instanceOf(AccurateClock.class)));
+    }
+
+    @Test
+    void shouldExposeSpecificClock() {
+        // Given:
+        final Clock clock = mock(Clock.class);
+        // When:
+        final CreekContext ctx = CreekServices.builder(serviceDescriptor).with(clock).build();
+
+        // Then:
+        assertThat(ctx.clock(), is(sameInstance(clock)));
     }
 
     @Test

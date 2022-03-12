@@ -17,6 +17,7 @@
 package org.creek.api.service.context;
 
 
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.platform.metadata.ServiceDescriptor;
 import org.creek.api.service.extension.CreekExtensionOptions;
 import org.creek.internal.service.context.ContextBuilder;
@@ -47,6 +48,19 @@ public final class CreekServices {
     }
 
     public interface Builder {
+
+        /**
+         * Set an explicit clock impl.
+         *
+         * <p>Note: the clock impl actually used can still be overridden at runtime via an
+         * environment variable. See {@link
+         * org.creek.internal.service.context.temporal.SystemEnvClockLoader}.
+         *
+         * @param clock the clock impl to use.
+         * @return self.
+         */
+        Builder with(Clock clock);
+
         /**
          * Set extension options.
          *
