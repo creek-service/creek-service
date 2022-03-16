@@ -1,8 +1,17 @@
 --add-modules
   org.junitpioneer,org.hamcrest
 
+--add-exports
+  creek.service.context/org.creek.internal.service.context.temporal=creek.base.type
+
 --add-reads
   creek.service.context=org.junitpioneer,org.hamcrest
 
 --add-opens
   org.junitpioneer/org.junitpioneer.jupiter=org.junit.platform.commons
+
+--add-opens
+  java.base/java.lang=org.junitpioneer
+
+--add-opens
+  java.base/java.util=org.junitpioneer

@@ -20,8 +20,11 @@ import static java.util.Objects.requireNonNull;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.creek.api.base.annotation.VisibleForTesting;
+import org.creek.api.base.type.temporal.AccurateClock;
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.observability.logging.structured.StructuredLogger;
 import org.creek.api.observability.logging.structured.StructuredLoggerFactory;
 import org.creek.api.platform.metadata.ComponentDescriptor;
@@ -31,7 +34,9 @@ import org.creek.api.service.extension.CreekExtension;
 import org.creek.api.service.extension.CreekExtensionBuilder;
 import org.creek.api.service.extension.CreekExtensionOptions;
 import org.creek.api.service.extension.CreekExtensions;
+import org.creek.internal.service.context.temporal.SystemEnvClockLoader;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class ContextBuilder implements CreekServices.Builder {
 
     private static final StructuredLogger LOGGER =
@@ -43,6 +48,7 @@ public final class ContextBuilder implements CreekServices.Builder {
     private final Runnable systemExit;
     private final String installedExtensions;
     private final List<CreekExtensionBuilder> builders;
+    private Optional<Clock> explicitClock = Optional.empty();
 
     public ContextBuilder(final ComponentDescriptor component) {
         this(
@@ -76,6 +82,12 @@ public final class ContextBuilder implements CreekServices.Builder {
     }
 
     @Override
+    public CreekServices.Builder with(final Clock clock) {
+        explicitClock = Optional.of(clock);
+        return this;
+    }
+
+    @Override
     public ContextBuilder with(final CreekExtensionOptions options) {
         final boolean handled =
                 builders.stream()
@@ -98,9 +110,7 @@ public final class ContextBuilder implements CreekServices.Builder {
     public CreekContext build() {
         installDefaultUncaughtExceptionHandler();
 
-        final List<CreekExtension> extensions = initializeExtensions();
-
-        return contextFactory.build(extensions);
+        return contextFactory.build(createClock(), createExtensions());
     }
 
     private void installDefaultUncaughtExceptionHandler() {
@@ -131,7 +141,12 @@ public final class ContextBuilder implements CreekServices.Builder {
         }
     }
 
-    private List<CreekExtension> initializeExtensions() {
+    private Clock createClock() {
+        return new SystemEnvClockLoader()
+                .load(() -> explicitClock.orElseGet(AccurateClock::create));
+    }
+
+    private List<CreekExtension> createExtensions() {
         return builders.stream().map(ext -> ext.build(component)).collect(Collectors.toList());
     }
 
@@ -156,7 +171,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ContextFactory {
-        CreekContext build(List<CreekExtension> extensions);
+        CreekContext build(Clock clock, List<CreekExtension> extensions);
     }
 
     @VisibleForTesting

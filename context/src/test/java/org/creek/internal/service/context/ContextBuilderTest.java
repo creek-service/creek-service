@@ -21,6 +21,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +30,8 @@ import static org.mockito.Mockito.when;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.stream.Stream;
+import org.creek.api.base.type.temporal.AccurateClock;
+import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.platform.metadata.ComponentDescriptor;
 import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.context.CreekContext;
@@ -37,9 +41,12 @@ import org.creek.api.service.extension.CreekExtensionOptions;
 import org.creek.internal.service.context.ContextBuilder.ContextFactory;
 import org.creek.internal.service.context.ContextBuilder.UnhandledExceptionHandlerInstaller;
 import org.creek.internal.service.context.ContextBuilder.UnsupportedResourceTypesException;
+import org.creek.internal.service.context.temporal.SystemEnvClockLoader;
+import org.creek.internal.service.context.temporal.TestClock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -63,6 +70,7 @@ class ContextBuilderTest {
     @Mock private CreekContext ctx;
     @Mock private Runnable systemExit;
     @Mock private UnhandledExceptionHandlerInstaller exceptionHandlerInstaller;
+    @Mock private Clock specificClock;
     @Captor private ArgumentCaptor<UncaughtExceptionHandler> exceptionHandlerCaptor;
     private ContextBuilder ctxBuilder;
 
@@ -78,7 +86,7 @@ class ContextBuilderTest {
         when(extBuilder1.with(any())).thenReturn(true);
         when(extBuilder1.build(any())).thenReturn(ext1);
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
-        when(contextFactory.build(any())).thenReturn(ctx);
+        when(contextFactory.build(any(), any())).thenReturn(ctx);
 
         ctxBuilder = newContextBuilder();
     }
@@ -182,7 +190,7 @@ class ContextBuilderTest {
         final CreekContext result = ctxBuilder.build();
 
         // Then:
-        verify(contextFactory).build(List.of(ext0, ext1));
+        verify(contextFactory).build(any(), eq(List.of(ext0, ext1)));
         assertThat(result, is(ctx));
     }
 
@@ -203,6 +211,42 @@ class ContextBuilderTest {
 
         // Then:
         verify(systemExit).run();
+    }
+
+    @Test
+    void shouldProvideDefaultClockImpl() {
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(contextFactory).build(isA(AccurateClock.class), any());
+    }
+
+    @Test
+    void shouldUseSpecificClockImpl() {
+        // Given:
+        ctxBuilder.with(specificClock);
+
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(contextFactory).build(eq(specificClock), any());
+    }
+
+    @SetEnvironmentVariable(
+            key = SystemEnvClockLoader.ENV_VAR_NAME,
+            value = "org.creek.internal.service.context.temporal.TestClock")
+    @Test
+    void shouldOverrideClockImpl() {
+        // Given:
+        ctxBuilder.with(specificClock);
+
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(contextFactory).build(isA(TestClock.class), any());
     }
 
     private ContextBuilder newContextBuilder() {
