@@ -34,7 +34,7 @@ public class JavaNineExtensionBuilder2 implements CreekExtensionBuilder {
     }
 
     @Override
-    public boolean accepts(final ResourceDescriptor resourceDef) {
+    public boolean handles(final ResourceDescriptor resourceDef) {
         return resourceDef instanceof Internal || resourceDef instanceof Output;
     }
 

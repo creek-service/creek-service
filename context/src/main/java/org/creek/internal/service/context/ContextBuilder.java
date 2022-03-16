@@ -132,7 +132,7 @@ public final class ContextBuilder implements CreekServices.Builder {
                         .filter(
                                 resourceDef ->
                                         builders.stream()
-                                                .noneMatch(ext -> ext.accepts(resourceDef)))
+                                                .noneMatch(ext -> ext.handles(resourceDef)))
                         .collect(Collectors.toList());
 
         if (!unsupported.isEmpty()) {

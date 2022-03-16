@@ -78,11 +78,11 @@ class ContextBuilderTest {
     void setUp() {
         when(component.name()).thenReturn("comp");
         when(extBuilder0.name()).thenReturn("builder0");
-        when(extBuilder0.accepts(res0)).thenReturn(true);
+        when(extBuilder0.handles(res0)).thenReturn(true);
         when(extBuilder0.with(any())).thenReturn(true);
         when(extBuilder0.build(any())).thenReturn(ext0);
         when(extBuilder1.name()).thenReturn("builder1");
-        when(extBuilder1.accepts(res1)).thenReturn(true);
+        when(extBuilder1.handles(res1)).thenReturn(true);
         when(extBuilder1.with(any())).thenReturn(true);
         when(extBuilder1.build(any())).thenReturn(ext1);
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
@@ -145,7 +145,7 @@ class ContextBuilderTest {
     @Test
     void shouldThrowIfResourceNotHandledByAnyExtension() {
         // Given:
-        when(extBuilder0.accepts(any())).thenReturn(false);
+        when(extBuilder0.handles(any())).thenReturn(false);
 
         // When:
         final Exception e =
@@ -163,8 +163,8 @@ class ContextBuilderTest {
     @Test
     void shouldIncludeAllUnsupportedResourcesInException() {
         // Given:
-        when(extBuilder0.accepts(any())).thenReturn(false);
-        when(extBuilder1.accepts(any())).thenReturn(false);
+        when(extBuilder0.handles(any())).thenReturn(false);
+        when(extBuilder1.handles(any())).thenReturn(false);
 
         // When:
         final Exception e =

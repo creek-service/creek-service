@@ -39,7 +39,7 @@ public interface CreekExtensionBuilder {
      * @param resourceDef the resource descriptor
      * @return {@code true} if the extension handles this type of resource, {@code false} otherwise.
      */
-    boolean accepts(ResourceDescriptor resourceDef);
+    boolean handles(ResourceDescriptor resourceDef);
 
     /**
      * Registers custom options for an extension with the builder.

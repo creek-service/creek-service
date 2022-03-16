@@ -32,7 +32,7 @@ public class JavaEightExtensionBuilder implements CreekExtensionBuilder {
     }
 
     @Override
-    public boolean accepts(final ResourceDescriptor resourceDef) {
+    public boolean handles(final ResourceDescriptor resourceDef) {
         return false;
     }
 
