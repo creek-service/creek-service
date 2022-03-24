@@ -20,8 +20,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.service.context.CreekContext;
@@ -30,17 +28,11 @@ import org.creek.api.service.extension.CreekExtension;
 final class Context implements CreekContext {
 
     private final Clock clock;
-    private final Map<Class<? extends CreekExtension>, CreekExtension> extensions;
+    private final List<CreekExtension> extensions;
 
-    Context(final Clock clock, final List<CreekExtension> extensions) {
+    Context(final Clock clock, final Collection<CreekExtension> extensions) {
         this.clock = requireNonNull(clock, "clock");
-        this.extensions =
-                requireNonNull(extensions, "extensions").stream()
-                        .collect(
-                                Collectors.toMap(
-                                        CreekExtension::getClass,
-                                        Function.identity(),
-                                        Context::throwOnExtensionTypeClash));
+        this.extensions = List.copyOf(requireNonNull(extensions, "extensions"));
     }
 
     @Override
@@ -51,25 +43,12 @@ final class Context implements CreekContext {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends CreekExtension> T extension(final Class<T> extensionType) {
-        final CreekExtension ext = extensions.get(extensionType);
-        if (ext == null) {
-            throw new UnknownExtensionException(extensionType, extensions.values());
-        }
-
-        return (T) ext;
-    }
-
-    private static CreekExtension throwOnExtensionTypeClash(
-            final CreekExtension e0, final CreekExtension e1) {
-        throw new ExtensionTypeClashException(e0.getClass());
-    }
-
-    private static class ExtensionTypeClashException extends IllegalArgumentException {
-        ExtensionTypeClashException(final Class<?> extensionType) {
-            super(
-                    "Multiple extensions found with the same type. This is not supported. type: "
-                            + extensionType);
-        }
+        return (T)
+                extensions.stream()
+                        .filter(ext -> extensionType.isAssignableFrom(ext.getClass()))
+                        .findFirst()
+                        .orElseThrow(
+                                () -> new UnknownExtensionException(extensionType, extensions));
     }
 
     private static class UnknownExtensionException extends IllegalArgumentException {

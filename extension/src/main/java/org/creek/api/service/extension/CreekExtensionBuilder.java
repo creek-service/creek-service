@@ -24,7 +24,9 @@ import org.creek.api.platform.metadata.ResourceDescriptor;
  * Builder of extension to Creek.
  *
  * <p>Creek will look for extensions using {@link java.util.ServiceLoader} to load instances of
- * {@code CreekExtensionProvider} from the class & module paths.
+ * {@link CreekExtensionBuilder} from the class & module paths. To be loaded by Creek the extension
+ * must be registered in either the {@code module-info.java} file as a {@code provider} of {@link
+ * CreekExtensionBuilder} and/or have a suitable entry in the {@code META-INFO.services} directory.
  */
 public interface CreekExtensionBuilder {
 
@@ -44,7 +46,7 @@ public interface CreekExtensionBuilder {
     /**
      * Registers custom options for an extension with the builder.
      *
-     * <p>Creek will pass all options instances to each extension builder. Implementations can
+     * <p>Creek will pass all options instances to all extension builders. Implementations can
      * ignore any or all options. Creek will throw if no registered extension handles user supplied
      * options.
      *

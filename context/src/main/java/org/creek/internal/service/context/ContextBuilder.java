@@ -17,8 +17,12 @@
 package org.creek.internal.service.context;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.collectingAndThen;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.security.ProtectionDomain;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -146,8 +150,54 @@ public final class ContextBuilder implements CreekServices.Builder {
                 .load(() -> explicitClock.orElseGet(AccurateClock::create));
     }
 
-    private List<CreekExtension> createExtensions() {
-        return builders.stream().map(ext -> ext.build(component)).collect(Collectors.toList());
+    private Collection<CreekExtension> createExtensions() {
+        return builders.stream()
+                .map(ext -> ext.build(component))
+                .collect(
+                        Collectors.groupingBy(
+                                CreekExtension::getClass,
+                                collectingAndThen(
+                                        Collectors.toList(),
+                                        ContextBuilder::throwOnExtensionTypeClash)))
+                .values()
+                .stream()
+                .sorted(
+                        Comparator.comparing(
+                                CreekExtension::getClass, Comparator.comparing(Class::getName)))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private static CreekExtension throwOnExtensionTypeClash(final List<CreekExtension> extensions) {
+        if (extensions.size() == 1) {
+            return extensions.get(0);
+        }
+
+        throw new ExtensionTypeClashException(extensions);
+    }
+
+    private static class ExtensionTypeClashException extends IllegalArgumentException {
+        ExtensionTypeClashException(final Collection<? extends CreekExtension> extensions) {
+            super(
+                    "Multiple extensions found with the same type. This is not supported. type: "
+                            + type(extensions)
+                            + ", locations: "
+                            + locations(extensions));
+        }
+
+        private static String type(final Collection<? extends CreekExtension> extensions) {
+            return extensions.isEmpty()
+                    ? "Unknown"
+                    : extensions.iterator().next().getClass().getName();
+        }
+
+        private static String locations(final Collection<? extends CreekExtension> extensions) {
+            return extensions.stream()
+                    .map(Object::getClass)
+                    .map(Class::getProtectionDomain)
+                    .map(ProtectionDomain::getCodeSource)
+                    .map(src -> src == null ? "unknown" : src.getLocation().toString())
+                    .collect(Collectors.joining(", ", "[", "]"));
+        }
     }
 
     @VisibleForTesting
@@ -171,7 +221,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ContextFactory {
-        CreekContext build(Clock clock, List<CreekExtension> extensions);
+        CreekContext build(Clock clock, Collection<CreekExtension> extensions);
     }
 
     @VisibleForTesting
