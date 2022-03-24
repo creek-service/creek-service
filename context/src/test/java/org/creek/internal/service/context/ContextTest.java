@@ -42,7 +42,7 @@ class ContextTest {
 
     @Mock private Clock clock;
     @Mock private TestExtension0 ext0;
-    @Mock private TestExtension1 ext1;
+    @Mock private PrivateExtensionImpl ext1;
     private Context ctx;
 
     @BeforeEach
@@ -60,35 +60,30 @@ class ContextTest {
 
     @Test
     void shouldGetExtensionByType() {
-        assertThat(ctx.extension(ext0.getClass()), is(ext0));
-        assertThat(ctx.extension(ext1.getClass()), is(ext1));
+        assertThat(ctx.extension(TestExtension0.class), is(ext0));
     }
 
     @Test
-    void shouldThrowMeaningfulExceptionIfTwoExtensionsHaveTheSameType() {
-        // When:
-        final Exception e =
-                assertThrows(Exception.class, () -> new Context(clock, List.of(ext0, ext0)));
+    void shouldGetExtensionBySubType() {
+        assertThat(ctx.extension(PublicExtensionInterface.class), is(ext1));
+    }
 
-        // Then:
-        assertThat(
-                e.getMessage(),
-                is(
-                        "Multiple extensions found with the same type. This is not supported. type: "
-                                + ext0.getClass()));
+    @Test
+    void shouldGetFirstExtensionThatMatches() {
+        assertThat(ctx.extension(CreekExtension.class), is(ext0));
     }
 
     @Test
     void shouldThrowExceptionOnGetOfUnregisteredExtensionType() {
         // When:
         final Exception e =
-                assertThrows(Exception.class, () -> ctx.extension(CreekExtension.class));
+                assertThrows(Exception.class, () -> ctx.extension(UnknownExtension.class));
 
         // Then:
         assertThat(
                 e.getMessage(),
                 startsWith(
-                        "No extension of requested type is registered: " + CreekExtension.class));
+                        "No extension of requested type is registered: " + UnknownExtension.class));
         assertThat(
                 e.getMessage(),
                 either(containsString(", installed_extensions: [ext0, ext1]"))
@@ -97,5 +92,9 @@ class ContextTest {
 
     private interface TestExtension0 extends CreekExtension {}
 
-    private interface TestExtension1 extends CreekExtension {}
+    private interface PublicExtensionInterface extends CreekExtension {}
+
+    private abstract static class PrivateExtensionImpl implements PublicExtensionInterface {}
+
+    private interface UnknownExtension extends CreekExtension {}
 }

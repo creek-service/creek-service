@@ -52,11 +52,6 @@ class CreekServicesTest {
 
     @BeforeEach
     void setUp() {
-        assertThat(
-                "Invoke constructor for code coverage",
-                new KeepSpotbugsHappy(),
-                is(notNullValue()));
-
         when(serviceDescriptor.name()).thenReturn("the-service");
         when(serviceDescriptor.resources()).thenCallRealMethod();
     }

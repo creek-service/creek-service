@@ -17,4 +17,4 @@
 package org.creek.test.service.context;
 
 @SuppressWarnings("unused") // Spotbugs fails if there are no source files...
-final class KeepSpotbugsHappy {}
+interface KeepSpotbugsHappy {}

@@ -19,6 +19,7 @@ package org.creek.internal.service.context;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -64,8 +65,8 @@ class ContextBuilderTest {
     @Mock private CreekExtensionOptions options;
     @Mock private CreekExtensionBuilder extBuilder0;
     @Mock private CreekExtensionBuilder extBuilder1;
-    @Mock private CreekExtension ext0;
-    @Mock private CreekExtension ext1;
+    @Mock private TestExtensionA ext0;
+    @Mock private TestExtensionB ext1;
     @Mock private ContextFactory contextFactory;
     @Mock private CreekContext ctx;
     @Mock private Runnable systemExit;
@@ -185,7 +186,7 @@ class ContextBuilderTest {
     }
 
     @Test
-    void shouldBuildContextWithExtensions() {
+    void shouldBuildContextWithSortedExtensions() {
         // Given:
         final CreekContext result = ctxBuilder.build();
 
@@ -249,6 +250,28 @@ class ContextBuilderTest {
         verify(contextFactory).build(isA(TestClock.class), any());
     }
 
+    @Test
+    void shouldThrowHelpfulExceptionOnMultipleImplsOfSameExtension() {
+        // Given:
+        when(extBuilder0.build(any())).thenReturn(ext0);
+        when(extBuilder1.build(any())).thenReturn(ext0);
+
+        // When:
+        final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);
+
+        // Then:
+        assertThat(
+                e.getMessage(),
+                startsWith(
+                        "Multiple extensions found with the same type. This is not supported. "));
+        assertThat(e.getMessage(), containsString("type: " + ext0.getClass().getName()));
+        assertThat(
+                e.getMessage(),
+                containsString(
+                        "locations: ["
+                                + getClass().getProtectionDomain().getCodeSource().getLocation()));
+    }
+
     private ContextBuilder newContextBuilder() {
         return new ContextBuilder(
                 component,
@@ -257,4 +280,8 @@ class ContextBuilderTest {
                 exceptionHandlerInstaller,
                 systemExit);
     }
+
+    private interface TestExtensionA extends CreekExtension {}
+
+    private interface TestExtensionB extends CreekExtension {}
 }
