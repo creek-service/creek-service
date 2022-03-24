@@ -185,9 +185,7 @@ public final class ContextBuilder implements CreekServices.Builder {
         }
 
         private static String type(final Collection<? extends CreekExtension> extensions) {
-            return extensions.isEmpty()
-                    ? "Unknown"
-                    : extensions.iterator().next().getClass().getName();
+            return extensions.iterator().next().getClass().getName();
         }
 
         private static String locations(final Collection<? extends CreekExtension> extensions) {
