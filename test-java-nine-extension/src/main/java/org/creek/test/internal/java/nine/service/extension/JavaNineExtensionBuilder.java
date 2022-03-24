@@ -14,37 +14,37 @@
  * limitations under the License.
  */
 
-package org.creek.test.java.eight.service.extension;
+package org.creek.test.internal.java.nine.service.extension;
 
 
 import org.creek.api.platform.metadata.ComponentDescriptor;
 import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.extension.CreekExtension;
 import org.creek.api.service.extension.CreekExtensionBuilder;
+import org.creek.api.service.extension.CreekExtensionOptions;
+import org.creek.test.api.java.nine.service.extension.JavaNineExtension;
+import org.creek.test.api.java.nine.service.extension.JavaNineExtensionInput;
+import org.creek.test.api.java.nine.service.extension.JavaNineExtensionOptions;
 
-public final class JavaEightExtensionBuilder implements CreekExtensionBuilder {
-
-    private static final String NAME = "java8";
+public final class JavaNineExtensionBuilder implements CreekExtensionBuilder {
 
     @Override
     public String name() {
-        return NAME;
+        return JavaNineExtension.NAME;
     }
 
     @Override
     public boolean handles(final ResourceDescriptor resourceDef) {
-        return false;
+        return resourceDef instanceof JavaNineExtensionInput;
+    }
+
+    @Override
+    public boolean with(final CreekExtensionOptions options) {
+        return options instanceof JavaNineExtensionOptions;
     }
 
     @Override
     public CreekExtension build(final ComponentDescriptor component) {
-        return new Extension();
-    }
-
-    private static final class Extension implements CreekExtension {
-        @Override
-        public String name() {
-            return NAME;
-        }
+        return new JavaNineExtension();
     }
 }

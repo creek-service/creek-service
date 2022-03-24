@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
+package org.creek.test.api.java.nine.service.extension;
 
-import org.creek.api.service.extension.CreekExtensionBuilder;
-import org.creek.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creek.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
 
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
+import org.creek.api.service.extension.CreekExtension;
 
-    exports org.creek.test.api.java.nine.service.extension;
+public final class JavaNineExtension implements CreekExtension {
 
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+    public static final String NAME = "java9";
+
+    @Override
+    public String name() {
+        return NAME;
+    }
 }
