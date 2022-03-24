@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
+plugins {
+    `java-library`
+}
 
-import org.creek.api.service.extension.CreekExtensionBuilder;
-import org.creek.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creek.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
-
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
-
-    exports org.creek.test.api.java.nine.service.extension;
-
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+dependencies {
+    implementation(project(":context"))
+    implementation(project(":test-java-eight-extension"))
+    implementation(project(":test-java-nine-extension"))
 }

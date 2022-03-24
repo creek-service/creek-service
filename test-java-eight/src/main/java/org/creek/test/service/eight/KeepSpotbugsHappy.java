@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
+package org.creek.test.service.eight;
 
-import org.creek.api.service.extension.CreekExtensionBuilder;
-import org.creek.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creek.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
-
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
-
-    exports org.creek.test.api.java.nine.service.extension;
-
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
-}
+@SuppressWarnings("unused") // Spotbugs fails if there are no source files...
+interface KeepSpotbugsHappy {}
