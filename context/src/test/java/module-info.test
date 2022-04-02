@@ -1,11 +1,11 @@
 --add-modules
-  org.junitpioneer,org.hamcrest
+  org.junitpioneer,org.hamcrest,guava.testlib,creek.test.util,creek.test.hamcrest,creek.test.conformity
+
+--add-reads
+  creek.service.context=org.junitpioneer,org.hamcrest,guava.testlib,creek.test.util,creek.test.hamcrest,creek.test.conformity
 
 --add-exports
   creek.service.context/org.creek.internal.service.context.temporal=creek.base.type
-
---add-reads
-  creek.service.context=org.junitpioneer,org.hamcrest
 
 --add-opens
   org.junitpioneer/org.junitpioneer.jupiter=org.junit.platform.commons
