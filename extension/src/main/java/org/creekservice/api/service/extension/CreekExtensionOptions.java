@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
+package org.creekservice.api.service.extension;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
-
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
-
-    exports org.creekservice.test.api.java.nine.service.extension;
-
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
-}
+/** Marker interface for extension option types. */
+public interface CreekExtensionOptions {}

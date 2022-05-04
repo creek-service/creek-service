@@ -2,12 +2,13 @@ plugins {
     `java-library`
 }
 
-val creekVersion : String by extra
+val creekBaseVersion : String by extra
+val creekObsVersion : String by extra
 
 dependencies {
     api(project(":extension"))
-    api("org.creek:creek-base-annotation:$creekVersion")
-    api("org.creek:creek-base-type:$creekVersion")
+    api("org.creekservice:creek-base-annotation:$creekBaseVersion")
+    api("org.creekservice:creek-base-type:$creekBaseVersion")
 
-    implementation("org.creek:creek-observability-logging:$creekVersion")
+    implementation("org.creekservice:creek-observability-logging:$creekObsVersion")
 }
