@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
+package org.creekservice;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
 
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
+import org.creekservice.api.test.conformity.ConformityTester;
+import org.junit.jupiter.api.Test;
 
-    exports org.creekservice.test.api.java.nine.service.extension;
+class ModuleTest {
 
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+    @Test
+    void shouldConform() {
+        ConformityTester.test(ModuleTest.class);
+    }
 }

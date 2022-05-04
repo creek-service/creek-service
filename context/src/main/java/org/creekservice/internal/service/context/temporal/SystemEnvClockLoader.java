@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
+package org.creekservice.internal.service.context.temporal;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
 
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
+import java.util.function.Supplier;
+import org.creekservice.api.base.type.config.SystemEnv;
+import org.creekservice.api.base.type.temporal.Clock;
 
-    exports org.creekservice.test.api.java.nine.service.extension;
+/** Loads the impl of the clock to load from an environment variable. */
+public final class SystemEnvClockLoader {
 
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+    public static final String ENV_VAR_NAME = "CREEK_CLOCK";
+
+    public Clock load(final Supplier<Clock> defaultClock) {
+        return SystemEnv.readInstance(ENV_VAR_NAME, defaultClock);
+    }
 }

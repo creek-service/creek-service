@@ -27,7 +27,7 @@ allprojects {
         apply(plugin = "jacoco")
     }
 
-    group = "org.creek"
+    group = "org.creekservice"
 
     java {
         withSourcesJar()

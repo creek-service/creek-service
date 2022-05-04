@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
+package org.creekservice.api.service.extension;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
 
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
-    exports org.creekservice.test.api.java.nine.service.extension;
+public final class CreekExtensions {
 
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+    private CreekExtensions() {}
+
+    /** Instantiate any extensions available at runtime. */
+    public static List<CreekExtensionBuilder> load() {
+        return ServiceLoader.load(CreekExtensionBuilder.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(Collectors.toUnmodifiableList());
+    }
 }

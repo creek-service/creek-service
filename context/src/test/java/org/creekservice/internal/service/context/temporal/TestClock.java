@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
+package org.creekservice.internal.service.context.temporal;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
 
-module creek.service.test.java.nine.extension {
-    requires transitive creek.service.extension;
+import java.time.Instant;
+import org.creekservice.api.base.type.temporal.Clock;
 
-    exports org.creekservice.test.api.java.nine.service.extension;
-
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+public final class TestClock implements Clock {
+    @Override
+    public Instant get() {
+        return null;
+    }
 }
