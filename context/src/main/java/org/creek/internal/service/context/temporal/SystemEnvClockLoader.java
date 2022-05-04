@@ -18,8 +18,8 @@ package org.creek.internal.service.context.temporal;
 
 
 import java.util.function.Supplier;
-import org.creek.api.base.type.config.SystemEnv;
-import org.creek.api.base.type.temporal.Clock;
+import org.creekservice.api.base.type.config.SystemEnv;
+import org.creekservice.api.base.type.temporal.Clock;
 
 /** Loads the impl of the clock to load from an environment variable. */
 public final class SystemEnvClockLoader {

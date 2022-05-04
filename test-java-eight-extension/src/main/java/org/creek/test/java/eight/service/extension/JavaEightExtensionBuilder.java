@@ -17,10 +17,10 @@
 package org.creek.test.java.eight.service.extension;
 
 
-import org.creek.api.platform.metadata.ComponentDescriptor;
-import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.extension.CreekExtension;
 import org.creek.api.service.extension.CreekExtensionBuilder;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.ResourceDescriptor;
 
 public final class JavaEightExtensionBuilder implements CreekExtensionBuilder {
 

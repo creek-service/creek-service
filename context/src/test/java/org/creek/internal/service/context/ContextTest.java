@@ -26,8 +26,8 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.service.extension.CreekExtension;
+import org.creekservice.api.base.type.temporal.Clock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

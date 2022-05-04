@@ -17,16 +17,21 @@
 package org.creek.api.service.extension;
 
 
-import org.creek.api.platform.metadata.ComponentDescriptor;
-import org.creek.api.platform.metadata.ResourceDescriptor;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.ResourceDescriptor;
 
 /**
  * Builder of extension to Creek.
  *
- * <p>Creek will look for extensions using {@link java.util.ServiceLoader} to load instances of
- * {@link CreekExtensionBuilder} from the class & module paths. To be loaded by Creek the extension
- * must be registered in either the {@code module-info.java} file as a {@code provider} of {@link
- * CreekExtensionBuilder} and/or have a suitable entry in the {@code META-INFO.services} directory.
+ * <p>Creek will look for extensions using {@link java.util.ServiceLoader} to load instances of this
+ * type from the class & module paths. Therefore, to be loaded by Creek the extension must:
+ *
+ * <ul>
+ *   <li>be listed in the {@code module-info.java} file as a {@code provider} of {@link
+ *       CreekExtensionBuilder}, if using Java modules, or
+ *   <li>have a suitable entry in the {@code META-INFO.services} directory
+ *   <li>or both
+ * </ul>
  */
 public interface CreekExtensionBuilder {
 

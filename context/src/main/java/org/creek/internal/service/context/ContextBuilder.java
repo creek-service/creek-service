@@ -26,12 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.creek.api.base.annotation.VisibleForTesting;
-import org.creek.api.base.type.temporal.AccurateClock;
-import org.creek.api.base.type.temporal.Clock;
-import org.creek.api.observability.logging.structured.StructuredLogger;
-import org.creek.api.observability.logging.structured.StructuredLoggerFactory;
-import org.creek.api.platform.metadata.ComponentDescriptor;
 import org.creek.api.service.context.CreekContext;
 import org.creek.api.service.context.CreekServices;
 import org.creek.api.service.extension.CreekExtension;
@@ -39,6 +33,12 @@ import org.creek.api.service.extension.CreekExtensionBuilder;
 import org.creek.api.service.extension.CreekExtensionOptions;
 import org.creek.api.service.extension.CreekExtensions;
 import org.creek.internal.service.context.temporal.SystemEnvClockLoader;
+import org.creekservice.api.base.annotation.VisibleForTesting;
+import org.creekservice.api.base.type.temporal.AccurateClock;
+import org.creekservice.api.base.type.temporal.Clock;
+import org.creekservice.api.observability.logging.structured.StructuredLogger;
+import org.creekservice.api.observability.logging.structured.StructuredLoggerFactory;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class ContextBuilder implements CreekServices.Builder {

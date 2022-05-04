@@ -17,10 +17,10 @@
 package org.creek.api.service.context;
 
 
-import org.creek.api.base.type.temporal.Clock;
-import org.creek.api.platform.metadata.ServiceDescriptor;
 import org.creek.api.service.extension.CreekExtensionOptions;
 import org.creek.internal.service.context.ContextBuilder;
+import org.creekservice.api.base.type.temporal.Clock;
+import org.creekservice.api.platform.metadata.ServiceDescriptor;
 
 /** Defines the entry point for initialising Creek and getting hold of a {@link CreekContext}. */
 public final class CreekServices {

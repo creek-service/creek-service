@@ -17,6 +17,6 @@
 package org.creek.test.api.java.nine.service.extension;
 
 
-import org.creek.api.platform.metadata.ComponentInput;
+import org.creekservice.api.platform.metadata.ComponentInput;
 
 public interface JavaNineExtensionInput extends ComponentInput {}

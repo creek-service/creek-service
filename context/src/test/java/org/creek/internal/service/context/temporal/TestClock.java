@@ -18,7 +18,7 @@ package org.creek.internal.service.context.temporal;
 
 
 import java.time.Instant;
-import org.creek.api.base.type.temporal.Clock;
+import org.creekservice.api.base.type.temporal.Clock;
 
 public final class TestClock implements Clock {
     @Override

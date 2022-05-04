@@ -17,8 +17,8 @@
 package org.creek.api.service.context;
 
 
-import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.service.extension.CreekExtension;
+import org.creekservice.api.base.type.temporal.Clock;
 
 /** One-stop shop for access to Creek functionality. */
 public interface CreekContext {

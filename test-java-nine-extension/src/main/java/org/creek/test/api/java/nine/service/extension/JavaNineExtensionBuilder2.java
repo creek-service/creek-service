@@ -17,12 +17,12 @@
 package org.creek.test.api.java.nine.service.extension;
 
 
-import org.creek.api.platform.metadata.ComponentDescriptor;
-import org.creek.api.platform.metadata.ComponentInternal;
-import org.creek.api.platform.metadata.ComponentOutput;
-import org.creek.api.platform.metadata.ResourceDescriptor;
 import org.creek.api.service.extension.CreekExtension;
 import org.creek.api.service.extension.CreekExtensionBuilder;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.ComponentInternal;
+import org.creekservice.api.platform.metadata.ComponentOutput;
+import org.creekservice.api.platform.metadata.ResourceDescriptor;
 
 public final class JavaNineExtensionBuilder2 implements CreekExtensionBuilder {
 

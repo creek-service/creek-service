@@ -21,9 +21,9 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.creek.api.base.type.temporal.Clock;
 import org.creek.api.service.context.CreekContext;
 import org.creek.api.service.extension.CreekExtension;
+import org.creekservice.api.base.type.temporal.Clock;
 
 final class Context implements CreekContext {
 
