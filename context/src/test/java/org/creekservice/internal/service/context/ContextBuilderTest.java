@@ -16,6 +16,7 @@
 
 package org.creekservice.internal.service.context;
 
+import static org.creekservice.internal.service.context.ContextBuilder.UnsupportedResourceTypesException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.when;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.creekservice.api.base.type.temporal.AccurateClock;
 import org.creekservice.api.base.type.temporal.Clock;
@@ -37,11 +40,13 @@ import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.internal.service.context.ContextBuilder.ContextFactory;
 import org.creekservice.internal.service.context.ContextBuilder.UnhandledExceptionHandlerInstaller;
-import org.creekservice.internal.service.context.ContextBuilder.UnsupportedResourceTypesException;
+import org.creekservice.internal.service.context.api.Creek;
+import org.creekservice.internal.service.context.api.Model;
+import org.creekservice.internal.service.context.api.Options;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
 import org.creekservice.internal.service.context.temporal.TestClock;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +55,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -59,12 +66,16 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ContextBuilderTest {
 
+    @Mock private Creek api;
+    @Mock private Creek initializingApi;
+    @Mock private Options options;
+    @Mock private Model model;
     @Mock private ComponentDescriptor component;
-    @Mock private ResourceDescriptor res0;
-    @Mock private ResourceDescriptor res1;
-    @Mock private CreekExtensionOptions options;
-    @Mock private CreekExtensionBuilder extBuilder0;
-    @Mock private CreekExtensionBuilder extBuilder1;
+    @Mock private ResourceA res0;
+    @Mock private ResourceB res1;
+    @Mock private CreekExtensionOptions customOptions;
+    @Mock private CreekExtensionProvider extProvider0;
+    @Mock private CreekExtensionProvider extProvider1;
     @Mock private TestExtensionA ext0;
     @Mock private TestExtensionB ext1;
     @Mock private ContextFactory contextFactory;
@@ -77,112 +88,107 @@ class ContextBuilderTest {
 
     @BeforeEach
     void setUp() {
+        when(api.options()).thenReturn(options);
+        when(api.model()).thenReturn(model);
+        when(api.initializing(any())).thenReturn(initializingApi);
+
+        when(model.hasType(any())).thenReturn(true);
+
         when(component.name()).thenReturn("comp");
-        when(extBuilder0.name()).thenReturn("builder0");
-        when(extBuilder0.handles(res0)).thenReturn(true);
-        when(extBuilder0.with(any())).thenReturn(true);
-        when(extBuilder0.build(any())).thenReturn(ext0);
-        when(extBuilder1.name()).thenReturn("builder1");
-        when(extBuilder1.handles(res1)).thenReturn(true);
-        when(extBuilder1.with(any())).thenReturn(true);
-        when(extBuilder1.build(any())).thenReturn(ext1);
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
         when(contextFactory.build(any(), any())).thenReturn(ctx);
+
+        when(extProvider0.initialize(any())).thenReturn(ext0);
+        when(ext0.name()).thenReturn("provider0");
+
+        when(extProvider1.initialize(any())).thenReturn(ext1);
+        when(ext1.name()).thenReturn("provider1");
 
         ctxBuilder = newContextBuilder();
     }
 
     @Test
-    void shouldThrowIfOptionsNotHandledByAnyExtension() {
+    void shouldThrowOnUnhandledOptions() {
         // Given:
-        when(extBuilder0.with(any())).thenReturn(false);
-        when(extBuilder1.with(any())).thenReturn(false);
+        when(options.unused()).thenReturn(Set.of(customOptions));
 
         // When:
-        final Exception e =
-                assertThrows(IllegalArgumentException.class, () -> ctxBuilder.with(options));
+        final Exception e = assertThrows(IllegalArgumentException.class, ctxBuilder::build);
 
         // Then:
         assertThat(
                 e.getMessage(),
                 is(
-                        "No registered extensions support the supplied options: options, installed_extensions: builder0, builder1"));
+                        "No registered Creek extensions were interested in the following options: customOptions, "
+                                + "installed_extensions: provider0, provider1"));
     }
 
     @Test
-    void shouldNotThrowIfAtLeastOneExtensionHandlesOptions() {
+    void shouldAddOptions() {
         // Given:
-        when(extBuilder0.with(any())).thenReturn(false);
-        when(extBuilder1.with(any())).thenReturn(true);
+        ctxBuilder.with(customOptions);
 
         // When:
-        ctxBuilder.with(options);
+        ctxBuilder.build();
 
         // Then: did not throw.
+        verify(options).add(customOptions);
     }
 
     @Test
-    void shouldNotThrowIfMoreThanExtensionHandlesOptions() {
+    void shouldThrowOnUnknownResourceType() {
         // Given:
-        when(extBuilder0.with(any())).thenReturn(true);
-        when(extBuilder1.with(any())).thenReturn(true);
-
-        // When:
-        ctxBuilder.with(options);
-
-        // Then: did not throw.
-    }
-
-    @Test
-    void shouldPassOptionsToAllBuilders() {
-        // When:
-        ctxBuilder.with(options);
-
-        // Then:
-        verify(extBuilder0).with(options);
-        verify(extBuilder0).with(options);
-    }
-
-    @Test
-    void shouldThrowIfResourceNotHandledByAnyExtension() {
-        // Given:
-        when(extBuilder0.handles(any())).thenReturn(false);
+        when(model.hasType(res0.getClass())).thenReturn(false);
+        when(model.hasType(res1.getClass())).thenReturn(true);
 
         // When:
         final Exception e =
-                assertThrows(UnsupportedResourceTypesException.class, this::newContextBuilder);
+                assertThrows(UnsupportedResourceTypesException.class, ctxBuilder::build);
 
         // Then:
         assertThat(
                 e.getMessage(),
                 is(
-                        "Component defines resources for which no extension is installed. "
+                        "Service descriptor defines resources for which no extension is installed. "
                                 + "Are you missing a Creek extension on the class or module path? "
-                                + "component: comp, unsupported_resources: [res0], installed_extensions: builder0, builder1"));
+                                + "component: comp, unsupported_resources: [res0], installed_extensions: provider0, provider1"));
     }
 
     @Test
     void shouldIncludeAllUnsupportedResourcesInException() {
         // Given:
-        when(extBuilder0.handles(any())).thenReturn(false);
-        when(extBuilder1.handles(any())).thenReturn(false);
+        when(model.hasType(res0.getClass())).thenReturn(false);
+        when(model.hasType(res1.getClass())).thenReturn(false);
 
         // When:
         final Exception e =
-                assertThrows(UnsupportedResourceTypesException.class, this::newContextBuilder);
+                assertThrows(UnsupportedResourceTypesException.class, ctxBuilder::build);
 
         // Then:
         assertThat(e.getMessage(), containsString("unsupported_resources: [res0, res1]"));
     }
 
     @Test
-    void shouldPassComponentToBuilders() {
+    void shouldPassApiToExtensionProviders() {
         // When:
         ctxBuilder.build();
 
         // Then:
-        verify(extBuilder0).build(component);
-        verify(extBuilder1).build(component);
+        verify(extProvider0).initialize(initializingApi);
+        verify(extProvider1).initialize(initializingApi);
+    }
+
+    @Test
+    void shouldPassInitializingExtensionProvidersToApi() {
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        final InOrder inOrder = Mockito.inOrder(api);
+        inOrder.verify(api).initializing(Optional.of(extProvider0));
+        inOrder.verify(api).initializing(Optional.empty());
+        inOrder.verify(api).initializing(Optional.of(extProvider1));
+        inOrder.verify(api).initializing(Optional.empty());
     }
 
     @Test
@@ -253,8 +259,7 @@ class ContextBuilderTest {
     @Test
     void shouldThrowHelpfulExceptionOnMultipleImplsOfSameExtension() {
         // Given:
-        when(extBuilder0.build(any())).thenReturn(ext0);
-        when(extBuilder1.build(any())).thenReturn(ext0);
+        when(extProvider1.initialize(any())).thenReturn(ext0);
 
         // When:
         final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);
@@ -275,7 +280,8 @@ class ContextBuilderTest {
     private ContextBuilder newContextBuilder() {
         return new ContextBuilder(
                 component,
-                List.of(extBuilder0, extBuilder1),
+                api,
+                List.of(extProvider0, extProvider1),
                 contextFactory,
                 exceptionHandlerInstaller,
                 systemExit);
@@ -284,4 +290,8 @@ class ContextBuilderTest {
     private interface TestExtensionA extends CreekExtension {}
 
     private interface TestExtensionB extends CreekExtension {}
+
+    private interface ResourceA extends ResourceDescriptor {}
+
+    private interface ResourceB extends ResourceDescriptor {}
 }

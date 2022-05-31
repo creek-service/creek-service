@@ -19,4 +19,4 @@ package org.creekservice.test.api.java.nine.service.extension;
 
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 
-public interface JavaNineExtensionOptions extends CreekExtensionOptions {}
+public final class JavaNineExtensionOptions implements CreekExtensionOptions {}

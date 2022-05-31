@@ -35,9 +35,9 @@ import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtension;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionInput;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionOptions;
+import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionProvider2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,8 +52,8 @@ class CreekServicesTest {
 
     @Mock private ServiceDescriptor serviceDescriptor;
     @Mock private JavaNineExtensionInput java9Input;
-    @Mock private JavaNineExtensionBuilder2.Internal java9Internal;
-    @Mock private JavaNineExtensionBuilder2.Output java9Output;
+    @Mock private JavaNineExtensionProvider2.Internal java9Internal;
+    @Mock private JavaNineExtensionProvider2.Output java9Output;
 
     @BeforeEach
     void setUp() {
@@ -87,9 +87,9 @@ class CreekServicesTest {
         final CreekContext ctx = CreekServices.context(serviceDescriptor);
 
         // Then:
-        assertThat(
-                ctx.extension(JavaNineExtensionBuilder2.Extension.class),
-                is(instanceOf(JavaNineExtensionBuilder2.Extension.class)));
+        final JavaNineExtensionProvider2.Extension ext =
+                ctx.extension(JavaNineExtensionProvider2.Extension.class);
+        assertThat(ext.serviceDescriptor(), is(serviceDescriptor));
     }
 
     @Test
@@ -104,12 +104,11 @@ class CreekServicesTest {
     @Test
     void shouldThrowIfOptionsNotHandledByAnyExtension() {
         // Given:
-        final CreekServices.Builder builder = CreekServices.builder(serviceDescriptor);
+        final CreekServices.Builder builder =
+                CreekServices.builder(serviceDescriptor).with(new UnhandledExtensionOptions());
 
         // Then:
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> builder.with(new UnhandledExtensionOptions()));
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
@@ -118,7 +117,7 @@ class CreekServicesTest {
         final CreekServices.Builder builder = CreekServices.builder(serviceDescriptor);
 
         // Then: does not throw.
-        builder.with(mock(JavaNineExtensionOptions.class)).build();
+        builder.with(new JavaNineExtensionOptions()).build();
     }
 
     @Test
@@ -128,12 +127,13 @@ class CreekServicesTest {
 
         // Then:
         final Exception e =
-                assertThrows(Exception.class, () -> CreekServices.builder(serviceDescriptor));
+                assertThrows(Exception.class, () -> CreekServices.context(serviceDescriptor));
 
         // Then:
         assertThat(
                 e.getMessage(),
-                startsWith("Component defines resources for which no extension is installed."));
+                startsWith(
+                        "Service descriptor defines resources for which no extension is installed."));
     }
 
     @Test

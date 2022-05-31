@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package org.creekservice.api.service.extension;
+package org.creekservice.api.service.extension.option;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Test;
+import org.creekservice.api.service.extension.CreekExtensionOptions;
 
-class CreekExtensionsTest {
+public interface OptionContainer extends OptionCollection {
 
-    @Test
-    void shouldFindNoExtensionsByDefault() {
-        assertThat(CreekExtensions.load(), is(empty()));
-    }
+    /**
+     * Adds options to the container.
+     *
+     * @param options the options to add
+     */
+    void add(CreekExtensionOptions options);
 }

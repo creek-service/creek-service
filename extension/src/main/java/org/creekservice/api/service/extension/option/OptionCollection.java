@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package org.creekservice.api.service.extension;
+package org.creekservice.api.service.extension.option;
 
 
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import org.creekservice.api.service.extension.CreekExtensionOptions;
 
-public final class CreekExtensions {
+public interface OptionCollection {
 
-    private CreekExtensions() {}
-
-    /** Instantiate any extensions available at runtime. */
-    public static List<CreekExtensionBuilder> load() {
-        return ServiceLoader.load(CreekExtensionBuilder.class).stream()
-                .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toUnmodifiableList());
-    }
+    /**
+     * Retrieve an option by type.
+     *
+     * @param type the type of option to retrieve.
+     * @param <T> the type of the option to retrieve.
+     * @return the option, if present, otherwise {@code empty}.
+     */
+    <T extends CreekExtensionOptions> Optional<T> get(Class<T> type);
 }

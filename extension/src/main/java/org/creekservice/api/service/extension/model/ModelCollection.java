@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package org.creekservice.test.api.java.nine.service.extension;
+package org.creekservice.api.service.extension.model;
 
 
-import org.creekservice.api.platform.metadata.ComponentInput;
+import org.creekservice.api.platform.metadata.ResourceDescriptor;
 
-public final class JavaNineExtensionInput implements ComponentInput {}
+/** A collection of extensions to the Creek System-test model: */
+public interface ModelCollection {
+
+    /**
+     * The model collection knows about the supplied extension {@code type}.
+     *
+     * <p>Either the exact {@code type} has been added, or one of its super types.
+     *
+     * @param type the type to look up.
+     * @return {@code true} if the collection knows about the type, {@code false} otherwise.
+     */
+    boolean hasType(Class<? extends ResourceDescriptor> type);
+}

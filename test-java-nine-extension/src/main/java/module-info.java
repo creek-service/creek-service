@@ -15,16 +15,16 @@
  */
 
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2;
-import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionProvider2;
+import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionProvider;
 
 module creek.service.test.java.nine.extension {
     requires transitive creek.service.extension;
 
     exports org.creekservice.test.api.java.nine.service.extension;
 
-    provides CreekExtensionBuilder with
-            JavaNineExtensionBuilder,
-            JavaNineExtensionBuilder2;
+    provides CreekExtensionProvider with
+            JavaNineExtensionProvider,
+            JavaNineExtensionProvider2;
 }

@@ -14,5 +14,4 @@
 # limitations under the License.
 #
 
-org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder
-org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionBuilder2
+org.creekservice.test.java.eight.service.extension.JavaEightExtensionProvider

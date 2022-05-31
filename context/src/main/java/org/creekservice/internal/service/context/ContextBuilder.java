@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.creekservice.api.base.annotation.VisibleForTesting;
 import org.creekservice.api.base.type.temporal.AccurateClock;
@@ -35,9 +36,9 @@ import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtension;
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
-import org.creekservice.api.service.extension.CreekExtensions;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.internal.service.context.api.Creek;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -50,14 +51,18 @@ public final class ContextBuilder implements CreekServices.Builder {
     private final ContextFactory contextFactory;
     private final UnhandledExceptionHandlerInstaller unhandledExceptionHandlerInstaller;
     private final Runnable systemExit;
-    private final String installedExtensions;
-    private final List<CreekExtensionBuilder> builders;
+    private final Creek api;
+    private final List<CreekExtensionProvider> extensionProviders;
     private Optional<Clock> explicitClock = Optional.empty();
 
-    public ContextBuilder(final ComponentDescriptor component) {
+    public ContextBuilder(
+            final ComponentDescriptor component,
+            final Creek api,
+            final List<CreekExtensionProvider> extensionProviders) {
         this(
                 component,
-                CreekExtensions.load(),
+                api,
+                extensionProviders,
                 Context::new,
                 Thread::setDefaultUncaughtExceptionHandler,
                 () -> System.exit(-1));
@@ -66,23 +71,20 @@ public final class ContextBuilder implements CreekServices.Builder {
     @VisibleForTesting
     ContextBuilder(
             final ComponentDescriptor component,
-            final List<CreekExtensionBuilder> builders,
+            final Creek api,
+            final List<CreekExtensionProvider> extensionProviders,
             final ContextFactory contextFactory,
             final UnhandledExceptionHandlerInstaller unhandledExceptionHandlerInstaller,
             final Runnable systemExit) {
-        this.builders = List.copyOf(requireNonNull(builders, "builders"));
+        this.api = requireNonNull(api, "api");
+        this.extensionProviders =
+                List.copyOf(requireNonNull(extensionProviders, "extensionProviders"));
         this.contextFactory = requireNonNull(contextFactory, "contextFactory");
         this.unhandledExceptionHandlerInstaller =
                 requireNonNull(
                         unhandledExceptionHandlerInstaller, "unhandledExceptionHandlerInstaller");
         this.systemExit = requireNonNull(systemExit, "systemExit");
-        this.installedExtensions =
-                builders.stream()
-                        .map(CreekExtensionBuilder::name)
-                        .collect(Collectors.joining(", ", "installed_extensions: ", ""));
         this.component = requireNonNull(component, "component");
-
-        throwOnUnsupportedResourceType();
     }
 
     @Override
@@ -93,20 +95,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @Override
     public ContextBuilder with(final CreekExtensionOptions options) {
-        final boolean handled =
-                builders.stream()
-                        .map(builder -> builder.with(options))
-                        .reduce((b0, b1) -> b0 || b1)
-                        .orElse(false);
-
-        if (!handled) {
-            throw new IllegalArgumentException(
-                    "No registered extensions support the supplied options: "
-                            + options
-                            + ", "
-                            + installedExtensions);
-        }
-
+        api.options().add(options);
         return this;
     }
 
@@ -114,7 +103,11 @@ public final class ContextBuilder implements CreekServices.Builder {
     public CreekContext build() {
         installDefaultUncaughtExceptionHandler();
 
-        return contextFactory.build(createClock(), createExtensions());
+        final Collection<CreekExtension> extensions = createExtensions();
+        final CreekContext ctx = contextFactory.build(createClock(), extensions);
+        throwOnUnsupportedResourceType(extensions);
+        throwOnUnusedOptionType(extensions);
+        return ctx;
     }
 
     private void installDefaultUncaughtExceptionHandler() {
@@ -129,20 +122,33 @@ public final class ContextBuilder implements CreekServices.Builder {
                 });
     }
 
-    private void throwOnUnsupportedResourceType() {
+    private void throwOnUnsupportedResourceType(final Collection<CreekExtension> extensions) {
         final List<Object> unsupported =
                 component
                         .resources()
-                        .filter(
-                                resourceDef ->
-                                        builders.stream()
-                                                .noneMatch(ext -> ext.handles(resourceDef)))
+                        .filter(resourceDef -> !api.model().hasType(resourceDef.getClass()))
                         .collect(Collectors.toList());
 
         if (!unsupported.isEmpty()) {
             throw new UnsupportedResourceTypesException(
-                    component, installedExtensions, unsupported);
+                    component, installedExtensions(extensions), unsupported);
         }
+    }
+
+    private void throwOnUnusedOptionType(final Collection<CreekExtension> extensions) {
+        final Set<CreekExtensionOptions> unused = api.options().unused();
+        if (unused.isEmpty()) {
+            return;
+        }
+
+        final String unusedText =
+                unused.stream().map(Object::toString).collect(Collectors.joining(", "));
+
+        throw new IllegalArgumentException(
+                "No registered Creek extensions were interested in the following options: "
+                        + unusedText
+                        + ", "
+                        + installedExtensions(extensions));
     }
 
     private Clock createClock() {
@@ -151,8 +157,8 @@ public final class ContextBuilder implements CreekServices.Builder {
     }
 
     private Collection<CreekExtension> createExtensions() {
-        return builders.stream()
-                .map(ext -> ext.build(component))
+        return extensionProviders.stream()
+                .map(this::initialize)
                 .collect(
                         Collectors.groupingBy(
                                 CreekExtension::getClass,
@@ -167,12 +173,26 @@ public final class ContextBuilder implements CreekServices.Builder {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    private CreekExtension initialize(final CreekExtensionProvider provider) {
+        try {
+            return provider.initialize(api.initializing(Optional.of(provider)));
+        } finally {
+            api.initializing(Optional.empty());
+        }
+    }
+
     private static CreekExtension throwOnExtensionTypeClash(final List<CreekExtension> extensions) {
         if (extensions.size() == 1) {
             return extensions.get(0);
         }
 
         throw new ExtensionTypeClashException(extensions);
+    }
+
+    private static String installedExtensions(final Collection<CreekExtension> extensions) {
+        return extensions.stream()
+                .map(CreekExtension::name)
+                .collect(Collectors.joining(", ", "installed_extensions: ", ""));
     }
 
     private static class ExtensionTypeClashException extends IllegalArgumentException {
@@ -206,7 +226,7 @@ public final class ContextBuilder implements CreekServices.Builder {
                 final String installedExtensions,
                 final List<Object> unsupportedResources) {
             super(
-                    "Component defines resources for which no extension is installed. "
+                    "Service descriptor defines resources for which no extension is installed. "
                             + "Are you missing a Creek extension on the class or module path? "
                             + "component: "
                             + component.name()

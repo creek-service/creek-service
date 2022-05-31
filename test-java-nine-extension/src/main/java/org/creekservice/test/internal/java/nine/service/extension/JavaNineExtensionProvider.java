@@ -17,34 +17,21 @@
 package org.creekservice.test.internal.java.nine.service.extension;
 
 
-import org.creekservice.api.platform.metadata.ComponentDescriptor;
-import org.creekservice.api.platform.metadata.ResourceDescriptor;
-import org.creekservice.api.service.extension.CreekExtension;
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.api.service.extension.CreekExtensionOptions;
+import java.util.Optional;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.CreekService;
+import org.creekservice.api.service.extension.model.ResourceHandler;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtension;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionInput;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionOptions;
 
-public final class JavaNineExtensionBuilder implements CreekExtensionBuilder {
+public final class JavaNineExtensionProvider implements CreekExtensionProvider {
 
     @Override
-    public String name() {
-        return JavaNineExtension.NAME;
-    }
-
-    @Override
-    public boolean handles(final ResourceDescriptor resourceDef) {
-        return resourceDef instanceof JavaNineExtensionInput;
-    }
-
-    @Override
-    public boolean with(final CreekExtensionOptions options) {
-        return options instanceof JavaNineExtensionOptions;
-    }
-
-    @Override
-    public CreekExtension build(final ComponentDescriptor component) {
-        return new JavaNineExtension();
+    public JavaNineExtension initialize(final CreekService creek) {
+        creek.model().addResource(JavaNineExtensionInput.class, new ResourceHandler<>() {});
+        final Optional<JavaNineExtensionOptions> options =
+                creek.options().get(JavaNineExtensionOptions.class);
+        return new JavaNineExtension(creek.service(), options);
     }
 }

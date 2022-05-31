@@ -20,22 +20,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.api.service.extension.CreekExtensions;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.CreekExtensionProviders;
 import org.junit.jupiter.api.Test;
 
-class CreekExtensionsTest {
+class CreekExtensionProvidersTest {
 
     @Test
     void shouldLoadJava8Extension() {
         // When:
-        final CreekExtensionBuilder ext = extByType("JavaEightExtensionBuilder");
+        final CreekExtensionProvider ext = extByType("JavaEightExtensionProvider");
 
         // Then:
         assertThat(ext, is(notNullValue()));
         assertThat(
                 ext.getClass().getName(),
-                is("org.creekservice.test.java.eight.service.extension.JavaEightExtensionBuilder"));
+                is(
+                        "org.creekservice.test.java.eight.service.extension.JavaEightExtensionProvider"));
         assertThat(
                 ext.getClass().getModule().getName(),
                 is("creek.service.test.java.eight.extension"));
@@ -44,20 +45,20 @@ class CreekExtensionsTest {
     @Test
     void shouldLoadJava9Extension() {
         // When:
-        final CreekExtensionBuilder ext = extByType("JavaNineExtensionBuilder");
+        final CreekExtensionProvider ext = extByType("JavaNineExtensionProvider");
 
         // Then:
         assertThat(ext, is(notNullValue()));
         assertThat(
                 ext.getClass().getName(),
                 is(
-                        "org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder"));
+                        "org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionProvider"));
         assertThat(
                 ext.getClass().getModule().getName(), is("creek.service.test.java.nine.extension"));
     }
 
-    private CreekExtensionBuilder extByType(final String className) {
-        return CreekExtensions.load().stream()
+    private CreekExtensionProvider extByType(final String className) {
+        return CreekExtensionProviders.load().stream()
                 .filter(ext -> ext.getClass().getSimpleName().equals(className))
                 .findFirst()
                 .orElse(null);

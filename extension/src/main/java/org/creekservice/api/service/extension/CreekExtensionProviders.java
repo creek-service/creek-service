@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package org.creekservice.test.api.java.nine.service.extension;
+package org.creekservice.api.service.extension;
 
 
-import org.creekservice.api.platform.metadata.ComponentInput;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
-public final class JavaNineExtensionInput implements ComponentInput {}
+public final class CreekExtensionProviders {
+
+    private CreekExtensionProviders() {}
+
+    /** Instantiate any extensions available at runtime. */
+    public static List<CreekExtensionProvider> load() {
+        return ServiceLoader.load(CreekExtensionProvider.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(Collectors.toUnmodifiableList());
+    }
+}
