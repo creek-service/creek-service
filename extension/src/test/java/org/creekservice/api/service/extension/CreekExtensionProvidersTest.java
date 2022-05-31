@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package org.creekservice.test.api.java.nine.service.extension;
+package org.creekservice.api.service.extension;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 
-import org.creekservice.api.platform.metadata.ComponentInput;
+import org.junit.jupiter.api.Test;
 
-public final class JavaNineExtensionInput implements ComponentInput {}
+class CreekExtensionProvidersTest {
+
+    @Test
+    void shouldFindNoExtensionsByDefault() {
+        assertThat(CreekExtensionProviders.load(), is(empty()));
+    }
+}

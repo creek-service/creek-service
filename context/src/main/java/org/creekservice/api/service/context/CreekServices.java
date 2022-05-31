@@ -20,7 +20,9 @@ package org.creekservice.api.service.context;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
+import org.creekservice.api.service.extension.CreekExtensionProviders;
 import org.creekservice.internal.service.context.ContextBuilder;
+import org.creekservice.internal.service.context.api.Creek;
 
 /** Defines the entry point for initialising Creek and getting hold of a {@link CreekContext}. */
 public final class CreekServices {
@@ -44,7 +46,7 @@ public final class CreekServices {
      * @return the context builder.
      */
     public static Builder builder(final ServiceDescriptor service) {
-        return new ContextBuilder(service);
+        return new ContextBuilder(service, new Creek(service), CreekExtensionProviders.load());
     }
 
     public interface Builder {

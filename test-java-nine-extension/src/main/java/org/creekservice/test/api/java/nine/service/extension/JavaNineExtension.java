@@ -16,15 +16,36 @@
 
 package org.creekservice.test.api.java.nine.service.extension;
 
+import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
+import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtension;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class JavaNineExtension implements CreekExtension {
 
     public static final String NAME = "java9";
 
+    private final ServiceDescriptor service;
+    private final Optional<JavaNineExtensionOptions> options;
+
+    public JavaNineExtension(
+            final ServiceDescriptor service, final Optional<JavaNineExtensionOptions> options) {
+        this.service = requireNonNull(service, "service");
+        this.options = requireNonNull(options, "options");
+    }
+
     @Override
     public String name() {
         return NAME;
+    }
+
+    public ServiceDescriptor serviceDescriptor() {
+        return service;
+    }
+
+    public Optional<JavaNineExtensionOptions> options() {
+        return options;
     }
 }

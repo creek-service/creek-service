@@ -17,31 +17,23 @@
 package org.creekservice.test.java.eight.service.extension;
 
 
-import org.creekservice.api.platform.metadata.ComponentDescriptor;
-import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.service.extension.CreekExtension;
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.CreekService;
 
-public final class JavaEightExtensionBuilder implements CreekExtensionBuilder {
-
-    private static final String NAME = "java8";
-
-    @Override
-    public String name() {
-        return NAME;
-    }
+public final class JavaEightExtensionProvider implements CreekExtensionProvider {
 
     @Override
-    public boolean handles(final ResourceDescriptor resourceDef) {
-        return false;
-    }
-
-    @Override
-    public CreekExtension build(final ComponentDescriptor component) {
+    public CreekExtension initialize(final CreekService creek) {
         return new Extension();
     }
 
     private static final class Extension implements CreekExtension {
+
+        private static final String NAME = "java8";
+
+        private Extension() {}
+
         @Override
         public String name() {
             return NAME;

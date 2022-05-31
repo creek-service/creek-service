@@ -19,7 +19,7 @@ package org.creekservice.api.service.extension;
 /**
  * Base type for extensions to Creek.
  *
- * <p>An extension is instantiated by an {@link CreekExtensionBuilder}.
+ * <p>An extension is instantiated by an {@link CreekExtensionProvider}.
  */
 public interface CreekExtension {
 

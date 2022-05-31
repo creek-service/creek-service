@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.creekservice.test.api.java.nine.service.extension;
+package org.creekservice.api.service.extension.model;
 
 
-import org.creekservice.api.platform.metadata.ComponentInput;
+import org.creekservice.api.platform.metadata.ResourceDescriptor;
 
-public final class JavaNineExtensionInput implements ComponentInput {}
+public interface ResourceHandler<T extends ResourceDescriptor> {}

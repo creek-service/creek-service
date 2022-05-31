@@ -21,41 +21,42 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-import org.creekservice.api.service.extension.CreekExtensionBuilder;
-import org.creekservice.api.service.extension.CreekExtensions;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.CreekExtensionProviders;
 import org.junit.jupiter.api.Test;
 
-class CreekExtensionsTest {
+class CreekExtensionProvidersTest {
 
     @Test
     void shouldLoadJava8Extension() {
         // When:
-        final CreekExtensionBuilder ext = extByType("JavaEightExtensionBuilder");
-
-        // Then:
-        assertThat(ext, is(notNullValue()));
-        assertThat(
-                ext.getClass().getName(),
-                is("org.creekservice.test.java.eight.service.extension.JavaEightExtensionBuilder"));
-        assertThat(ext.getClass().getModule().getName(), is(nullValue()));
-    }
-
-    @Test
-    void shouldLoadJava9Extension() {
-        // When:
-        final CreekExtensionBuilder ext = extByType("JavaNineExtensionBuilder");
+        final CreekExtensionProvider ext = extByType("JavaEightExtensionProvider");
 
         // Then:
         assertThat(ext, is(notNullValue()));
         assertThat(
                 ext.getClass().getName(),
                 is(
-                        "org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionBuilder"));
+                        "org.creekservice.test.java.eight.service.extension.JavaEightExtensionProvider"));
         assertThat(ext.getClass().getModule().getName(), is(nullValue()));
     }
 
-    private CreekExtensionBuilder extByType(final String className) {
-        return CreekExtensions.load().stream()
+    @Test
+    void shouldLoadJava9Extension() {
+        // When:
+        final CreekExtensionProvider ext = extByType("JavaNineExtensionProvider");
+
+        // Then:
+        assertThat(ext, is(notNullValue()));
+        assertThat(
+                ext.getClass().getName(),
+                is(
+                        "org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionProvider"));
+        assertThat(ext.getClass().getModule().getName(), is(nullValue()));
+    }
+
+    private CreekExtensionProvider extByType(final String className) {
+        return CreekExtensionProviders.load().stream()
                 .filter(ext -> ext.getClass().getSimpleName().equals(className))
                 .findFirst()
                 .orElse(null);
