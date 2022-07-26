@@ -110,7 +110,9 @@ public final class Model implements ModelContainer {
             case 0:
                 return Optional.empty();
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException(
+                        "Multiple registered resource handles can handle "
+                                + resourceType.getName());
         }
     }
 

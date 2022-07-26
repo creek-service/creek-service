@@ -29,9 +29,11 @@ public final class JavaNineExtensionProvider implements CreekExtensionProvider {
 
     @Override
     public JavaNineExtension initialize(final CreekService creek) {
-        creek.model().addResource(JavaNineExtensionInput.class, new ResourceHandler<>() {});
+        creek.model().addResource(JavaNineExtensionInput.class, new InputHandler());
         final Optional<JavaNineExtensionOptions> options =
                 creek.options().get(JavaNineExtensionOptions.class);
         return new JavaNineExtension(creek.service(), options);
     }
+
+    private static final class InputHandler implements ResourceHandler<JavaNineExtensionInput> {}
 }

@@ -58,6 +58,7 @@ class CreekServicesTest {
     @BeforeEach
     void setUp() {
         when(serviceDescriptor.name()).thenReturn("the-service");
+        when(serviceDescriptor.dockerImage()).thenReturn("the-image");
         when(serviceDescriptor.resources()).thenCallRealMethod();
     }
 

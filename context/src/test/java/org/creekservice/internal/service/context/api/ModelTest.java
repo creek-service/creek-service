@@ -20,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
@@ -167,12 +168,15 @@ class ModelTest {
         assertThat(testedMethodCount, is(publicMethodCount));
     }
 
+    @SuppressWarnings("unchecked")
     public static Stream<Arguments> publicMethods() {
         return Stream.of(
                 Arguments.of(
                         "addResource",
                         (Consumer<Model>)
-                                m -> m.addResource(TestResource.class, new ResourceHandler<>() {})),
+                                m ->
+                                        m.addResource(
+                                                TestResource.class, mock(ResourceHandler.class))),
                 Arguments.of("hasType", (Consumer<Model>) m -> m.hasType(TestResource.class)),
                 Arguments.of(
                         "resourceHandler",
