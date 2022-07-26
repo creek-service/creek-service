@@ -31,11 +31,15 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
     @Override
     public Extension initialize(final CreekService creek) {
         creek.model()
-                .addResource(Internal.class, new ResourceHandler<>() {})
-                .addResource(Output.class, new ResourceHandler<>() {});
+                .addResource(Internal.class, new InternalHandler())
+                .addResource(Output.class, new OutputHandler());
 
         return new Extension(creek.service());
     }
+
+    private static final class InternalHandler implements ResourceHandler<Internal> {}
+
+    private static final class OutputHandler implements ResourceHandler<Output> {}
 
     public static final class Extension implements CreekExtension {
 

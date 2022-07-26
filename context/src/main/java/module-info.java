@@ -5,6 +5,7 @@ module creek.service.context {
     requires transitive creek.base.type;
     requires transitive creek.service.extension;
     requires creek.observability.logging;
+    requires creek.platform.resource;
     requires com.github.spotbugs.annotations;
 
     exports org.creekservice.api.service.context;

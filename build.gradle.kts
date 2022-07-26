@@ -58,7 +58,7 @@ subprojects {
     extra.apply {
         set("creekBaseVersion", "0.2.0-SNAPSHOT")
         set("creekTestVersion", "0.2.0-SNAPSHOT")
-        set("creekMetadataVersion", "0.2.0-SNAPSHOT")
+        set("creekPlatformVersion", "0.2.0-SNAPSHOT")
         set("creekObsVersion", "0.2.0-SNAPSHOT")
         set("spotBugsVersion", "4.7.1")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 
@@ -88,7 +88,6 @@ subprojects {
         testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
         testImplementation("org.hamcrest:hamcrest-core:$hamcrestVersion")
         testImplementation("com.google.guava:guava-testlib:$guavaVersion")
-        testImplementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
         testImplementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
         testImplementation("org.apache.logging.log4j:log4j-slf4j18-impl:$log4jVersion")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
