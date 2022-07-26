@@ -21,7 +21,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,13 +52,13 @@ public final class Model implements ModelContainer {
             final Class<T> type, final ResourceHandler<? super T> handler) {
         throwIfNotOnCorrectThread();
 
-        final Optional<ResourceExtension<T>> existing = resourceExtension(type);
-        if (existing.isPresent()) {
+        final ResourceExtension<?> existing = resourceExtensions.get(type);
+        if (existing != null) {
             throw new IllegalArgumentException(
                     "Handler already registered for type: "
                             + type.getName()
                             + ", registering provider: "
-                            + existing.get().provider);
+                            + existing.provider);
         }
 
         resourceExtensions.put(
@@ -98,22 +97,47 @@ public final class Model implements ModelContainer {
             return Optional.of((ResourceExtension<T>) ext);
         }
 
-        final List<? extends ResourceExtension<?>> found =
+        final Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>> found =
                 resourceExtensions.entrySet().stream()
                         .filter(e -> e.getKey().isAssignableFrom(resourceType))
-                        .map(Map.Entry::getValue)
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        switch (found.size()) {
+        final Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>> reduced =
+                removeSuperTypes(found);
+
+        switch (reduced.size()) {
             case 1:
-                return Optional.of((ResourceExtension<T>) found.get(0));
+                return Optional.of((ResourceExtension<T>) reduced.values().iterator().next());
             case 0:
                 return Optional.empty();
             default:
-                throw new IllegalStateException(
-                        "Multiple registered resource handles can handle "
-                                + resourceType.getName());
+                throw new IllegalArgumentException(
+                        "Unable to determine most specific resource handler for type: "
+                                + resourceType.getName()
+                                + ". Could be any handler for any type in "
+                                + reduced.entrySet().stream()
+                                        .map(
+                                                e ->
+                                                        e.getKey().getSimpleName()
+                                                                + " ("
+                                                                + e.getValue().provider
+                                                                + ")")
+                                        .sorted()
+                                        .collect(Collectors.joining(", ", "[", "]")));
         }
+    }
+
+    private Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>>
+            removeSuperTypes(
+                    final Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>>
+                            types) {
+        return types.entrySet().stream()
+                .filter(
+                        e ->
+                                types.keySet().stream()
+                                        .filter(t -> !t.equals(e.getKey()))
+                                        .noneMatch(t -> e.getKey().isAssignableFrom(t)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private void throwIfNotOnCorrectThread() {
@@ -123,8 +147,8 @@ public final class Model implements ModelContainer {
     }
 
     private static final class ResourceExtension<T> {
-        private final ResourceHandler<? super T> handler;
-        private final CreekExtensionProvider provider;
+        final ResourceHandler<? super T> handler;
+        final CreekExtensionProvider provider;
 
         private ResourceExtension(
                 final ResourceHandler<? super T> handler, final CreekExtensionProvider provider) {

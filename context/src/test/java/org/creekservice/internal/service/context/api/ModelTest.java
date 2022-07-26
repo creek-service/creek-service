@@ -44,7 +44,9 @@ class ModelTest {
 
     private Model model;
     @Mock private CreekExtensionProvider provider;
-    @Mock private ResourceHandler<? super BaseResource> handler;
+    @Mock private ResourceHandler<? super ResourceDescriptor> handler1;
+    @Mock private ResourceHandler<? super ResourceDescriptor> handler2;
+    @Mock private ResourceHandler<? super ResourceDescriptor> handler3;
 
     @BeforeEach
     void setUp() {
@@ -61,7 +63,7 @@ class ModelTest {
         final Exception e =
                 assertThrows(
                         UnsupportedOperationException.class,
-                        () -> model.addResource(BaseResource.class, handler));
+                        () -> model.addResource(BaseResource.class, handler1));
 
         // Then:
         assertThat(
@@ -73,7 +75,7 @@ class ModelTest {
     @Test
     void shouldAddResource() {
         // When:
-        model.addResource(BaseResource.class, handler);
+        model.addResource(BaseResource.class, handler1);
 
         // Then:
         assertThat(model.hasType(BaseResource.class), is(true));
@@ -82,22 +84,82 @@ class ModelTest {
     @Test
     void shouldReturnTrueFromHaveTypeIfSuperTypeRegistered() {
         // When:
-        model.addResource(BaseResource.class, handler);
+        model.addResource(BaseResource.class, handler1);
 
         // Then:
         assertThat(model.hasType(TestResource.class), is(true));
     }
 
     @Test
-    void shouldThrowDuplicateResource() {
+    void shouldAllowAddOfSubType() {
         // Given:
-        model.addResource(BaseResource.class, handler);
+        model.addResource(BaseResource.class, handler1);
+
+        // When:
+        model.addResource(TestResource.class, handler2);
+
+        // Then:
+        assertThat(model.resourceHandler(BaseResource.class), is(handler1));
+        assertThat(model.resourceHandler(TestResource.class), is(handler2));
+    }
+
+    @Test
+    void shouldAllowAddOfSuperType() {
+        // Given:
+        model.addResource(TestResource.class, handler1);
+
+        // When:
+        model.addResource(BaseResource.class, handler2);
+
+        // Then:
+        assertThat(model.resourceHandler(TestResource.class), is(handler1));
+        assertThat(model.resourceHandler(BaseResource.class), is(handler2));
+    }
+
+    @Test
+    void shouldReturnMostSpecificHandler() {
+        // Given:
+        model.addResource(ResourceDescriptor.class, handler1);
+        model.addResource(TestResource.class, handler3);
+        model.addResource(BaseResource.class, handler2);
+
+        // Then:
+        assertThat(model.resourceHandler(TestResource2.class), is(handler3));
+        assertThat(model.resourceHandler(TestResource3.class), is(handler3));
+    }
+
+    @Test
+    void shouldThrowIfMostSpecificHandlerIsAmbiguous() {
+        // Given:
+        model.addResource(ResourceDescriptor.class, handler1);
+        model.addResource(BaseResource.class, handler2);
+        model.addResource(BaseResource2.class, handler3);
 
         // When:
         final Exception e =
                 assertThrows(
                         IllegalArgumentException.class,
-                        () -> model.addResource(BaseResource.class, handler));
+                        () -> model.resourceHandler(TestResource4.class));
+
+        // Then:
+        assertThat(
+                e.getMessage(),
+                is(
+                        "Unable to determine most specific resource handler for type: "
+                                + "org.creekservice.internal.service.context.api.ModelTest$TestResource4. "
+                                + "Could be any handler for any type in [BaseResource (provider), BaseResource2 (provider)]"));
+    }
+
+    @Test
+    void shouldThrowOnAddOnDuplicateResource() {
+        // Given:
+        model.addResource(BaseResource.class, handler1);
+
+        // When:
+        final Exception e =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> model.addResource(BaseResource.class, handler1));
 
         // Then:
         assertThat(
@@ -111,27 +173,27 @@ class ModelTest {
     @Test
     void shouldGetResourceHandlerForExactType() {
         // Given:
-        model.addResource(BaseResource.class, handler);
+        model.addResource(BaseResource.class, handler1);
 
         // When:
         final ResourceHandler<? super BaseResource> result =
                 model.resourceHandler(BaseResource.class);
 
         // Then:
-        assertThat(result, is(handler));
+        assertThat(result, is(handler1));
     }
 
     @Test
     void shouldGetResourceHandlerForSubType() {
         // Given:
-        model.addResource(BaseResource.class, handler);
+        model.addResource(BaseResource.class, handler1);
 
         // When:
         final ResourceHandler<? super TestResource> result =
                 model.resourceHandler(TestResource.class);
 
         // Then:
-        assertThat(result, is(handler));
+        assertThat(result, is(handler1));
     }
 
     @Test
@@ -194,5 +256,19 @@ class ModelTest {
 
     private interface BaseResource extends ResourceDescriptor {}
 
-    private static final class TestResource implements BaseResource {}
+    private interface BaseResource2 extends ResourceDescriptor {}
+
+    private static class TestResource implements BaseResource {}
+
+    /** ResourceDescriptor - BaseResource - TestResource - TestResource2 */
+    private static class TestResource2 extends TestResource {}
+
+    /**
+     * /- BaseResource - TestResource -\ ResourceDescriptor -| |- TestResource3 \--------
+     * BaseResource ---------\
+     */
+    private static class TestResource3 extends TestResource implements BaseResource {}
+
+    /** /- BaseResource -\ ResourceDescriptor -| |- TestResource4 \- BaseResource2 -\ */
+    private static class TestResource4 implements BaseResource, BaseResource2 {}
 }
