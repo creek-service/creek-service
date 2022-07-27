@@ -18,6 +18,7 @@ package org.creekservice.test.api.java.nine.service.extension;
 
 import static java.util.Objects.requireNonNull;
 
+import java.net.URI;
 import org.creekservice.api.platform.metadata.ComponentInternal;
 import org.creekservice.api.platform.metadata.ComponentOutput;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
@@ -61,7 +62,23 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
         }
     }
 
-    public static final class Internal implements ComponentInternal {}
+    public static final class Internal implements ComponentInternal {
 
-    public static final class Output implements ComponentOutput {}
+        private final URI id = URI.create("java9-2:test-resource");
+
+        @Override
+        public URI id() {
+            return id;
+        }
+    }
+
+    public static final class Output implements ComponentOutput {
+
+        private final URI id = URI.create("java9-2:test-resource");
+
+        @Override
+        public URI id() {
+            return id;
+        }
+    }
 }
