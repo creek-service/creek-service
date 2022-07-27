@@ -168,7 +168,7 @@ class CreekServicesTest {
     private static final class UnhandledResourceDef implements ComponentInput {
         @Override
         public URI id() {
-            return null;
+            return URI.create("kafka-topic://cluster/topic");
         }
     }
 }

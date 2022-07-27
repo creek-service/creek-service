@@ -52,9 +52,11 @@ import org.mockito.quality.Strictness;
 class CreekServicesTest {
 
     @Mock private ServiceDescriptor serviceDescriptor;
-    @Mock private JavaNineExtensionInput java9Input;
-    @Mock private JavaNineExtensionProvider2.Internal java9Internal;
-    @Mock private JavaNineExtensionProvider2.Output java9Output;
+    private final JavaNineExtensionInput java9Input = new JavaNineExtensionInput();
+    private final JavaNineExtensionProvider2.Internal java9Internal =
+            new JavaNineExtensionProvider2.Internal();
+    private final JavaNineExtensionProvider2.Output java9Output =
+            new JavaNineExtensionProvider2.Output();
 
     @BeforeEach
     void setUp() {
@@ -157,7 +159,7 @@ class CreekServicesTest {
     private static final class UnhandledResourceDef implements ComponentInput {
         @Override
         public URI id() {
-            return null;
+            return URI.create("kafka-topic://cluster/topic");
         }
     }
 }
