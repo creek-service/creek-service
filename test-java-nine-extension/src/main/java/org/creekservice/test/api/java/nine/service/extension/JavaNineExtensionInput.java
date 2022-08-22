@@ -17,6 +17,15 @@
 package org.creekservice.test.api.java.nine.service.extension;
 
 
+import java.net.URI;
 import org.creekservice.api.platform.metadata.ComponentInput;
 
-public final class JavaNineExtensionInput implements ComponentInput {}
+public final class JavaNineExtensionInput implements ComponentInput {
+
+    private final URI id = URI.create("java9:test-resource");
+
+    @Override
+    public URI id() {
+        return id;
+    }
+}

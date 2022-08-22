@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
 import static org.mockito.Mockito.mock;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
@@ -258,7 +259,13 @@ class ModelTest {
 
     private interface BaseResource2 extends ResourceDescriptor {}
 
-    private static class TestResource implements BaseResource {}
+    private static class TestResource implements BaseResource {
+
+        @Override
+        public URI id() {
+            return null;
+        }
+    }
 
     /** ResourceDescriptor - BaseResource - TestResource - TestResource2 */
     private static class TestResource2 extends TestResource {}
@@ -270,5 +277,11 @@ class ModelTest {
     private static class TestResource3 extends TestResource implements BaseResource {}
 
     /** /- BaseResource -\ ResourceDescriptor -| |- TestResource4 \- BaseResource2 -\ */
-    private static class TestResource4 implements BaseResource, BaseResource2 {}
+    private static class TestResource4 implements BaseResource, BaseResource2 {
+
+        @Override
+        public URI id() {
+            return null;
+        }
+    }
 }
