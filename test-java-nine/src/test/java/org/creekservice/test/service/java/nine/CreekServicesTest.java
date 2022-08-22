@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import org.creekservice.api.base.type.temporal.AccurateClock;
@@ -164,5 +165,10 @@ class CreekServicesTest {
 
     private static final class UnhandledExtensionOptions implements CreekExtensionOptions {}
 
-    private static final class UnhandledResourceDef implements ComponentInput {}
+    private static final class UnhandledResourceDef implements ComponentInput {
+        @Override
+        public URI id() {
+            return URI.create("kafka-topic://cluster/topic");
+        }
+    }
 }

@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.util.List;
 import org.creekservice.api.base.type.temporal.AccurateClock;
 import org.creekservice.api.base.type.temporal.Clock;
@@ -51,9 +52,11 @@ import org.mockito.quality.Strictness;
 class CreekServicesTest {
 
     @Mock private ServiceDescriptor serviceDescriptor;
-    @Mock private JavaNineExtensionInput java9Input;
-    @Mock private JavaNineExtensionProvider2.Internal java9Internal;
-    @Mock private JavaNineExtensionProvider2.Output java9Output;
+    private final JavaNineExtensionInput java9Input = new JavaNineExtensionInput();
+    private final JavaNineExtensionProvider2.Internal java9Internal =
+            new JavaNineExtensionProvider2.Internal();
+    private final JavaNineExtensionProvider2.Output java9Output =
+            new JavaNineExtensionProvider2.Output();
 
     @BeforeEach
     void setUp() {
@@ -153,5 +156,10 @@ class CreekServicesTest {
 
     private static final class UnhandledExtensionOptions implements CreekExtensionOptions {}
 
-    private static final class UnhandledResourceDef implements ComponentInput {}
+    private static final class UnhandledResourceDef implements ComponentInput {
+        @Override
+        public URI id() {
+            return URI.create("kafka-topic://cluster/topic");
+        }
+    }
 }
