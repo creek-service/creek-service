@@ -45,7 +45,7 @@ allprojects {
 subprojects {
     apply(plugin = "maven-publish")
 
-    if (name != "test-java-eight-extension"
+    if (name != ":test-java-eight-extension"
         && name != ":test-java-nine-extension"
         && name != ":test-service") {
         apply(plugin = "jacoco")
