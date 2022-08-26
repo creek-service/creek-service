@@ -20,11 +20,13 @@ import static org.creekservice.internal.service.context.ContextBuilder.Unsupport
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +40,8 @@ import org.creekservice.api.base.type.temporal.AccurateClock;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
+import org.creekservice.api.platform.resource.ResourceInitializer;
+import org.creekservice.api.platform.resource.ResourceInitializer.ResourceHandlers;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
@@ -83,6 +87,8 @@ class ContextBuilderTest {
     @Mock private Runnable systemExit;
     @Mock private UnhandledExceptionHandlerInstaller exceptionHandlerInstaller;
     @Mock private Clock specificClock;
+    @Mock private ContextBuilder.ResourceInitializerFactory resourceInitializerFactory;
+    @Mock private ResourceInitializer resourceInitializer;
     @Captor private ArgumentCaptor<UncaughtExceptionHandler> exceptionHandlerCaptor;
     private ContextBuilder ctxBuilder;
 
@@ -103,6 +109,8 @@ class ContextBuilderTest {
 
         when(extProvider1.initialize(any())).thenReturn(ext1);
         when(ext1.name()).thenReturn("provider1");
+
+        when(resourceInitializerFactory.build(any())).thenReturn(resourceInitializer);
 
         ctxBuilder = newContextBuilder();
     }
@@ -277,11 +285,51 @@ class ContextBuilderTest {
                                 + getClass().getProtectionDomain().getCodeSource().getLocation()));
     }
 
+    @Test
+    void shouldCreateResourceInitializerWithCorrectParams() {
+        // Given:
+        ctxBuilder.build();
+
+        final ArgumentCaptor<ResourceHandlers> captor =
+                ArgumentCaptor.forClass(ResourceHandlers.class);
+        verify(resourceInitializerFactory).build(captor.capture());
+        final ResourceHandlers handlers = captor.getValue();
+
+        // When:
+        handlers.get(ResourceA.class);
+
+        // Then:
+        verify(model).resourceHandler(ResourceA.class);
+    }
+
+    @Test
+    void shouldInitializeResources() {
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(resourceInitializer).service(List.of(component));
+    }
+
+    @Test
+    void shouldThrowIfResourceInitializationFails() {
+        // Given:
+        final RuntimeException expected = new RuntimeException("boom");
+        doThrow(expected).when(resourceInitializer).service(any());
+
+        // When:
+        final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);
+
+        // Then:
+        assertThat(e, is(sameInstance(expected)));
+    }
+
     private ContextBuilder newContextBuilder() {
         return new ContextBuilder(
                 component,
                 api,
                 List.of(extProvider0, extProvider1),
+                resourceInitializerFactory,
                 contextFactory,
                 exceptionHandlerInstaller,
                 systemExit);

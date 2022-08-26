@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.context;
 
-import static org.creekservice.api.platform.resource.ComponentValidator.componentValidator;
 
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
@@ -47,7 +46,6 @@ public final class CreekServices {
      * @return the context builder.
      */
     public static Builder builder(final ServiceDescriptor service) {
-        componentValidator().validate(service);
         return new ContextBuilder(service, new Creek(service), CreekExtensionProviders.load());
     }
 
