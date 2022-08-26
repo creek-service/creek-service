@@ -33,6 +33,7 @@ import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.observability.logging.structured.StructuredLogger;
 import org.creekservice.api.observability.logging.structured.StructuredLoggerFactory;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.resource.ResourceInitializer;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtension;
@@ -53,6 +54,7 @@ public final class ContextBuilder implements CreekServices.Builder {
     private final Runnable systemExit;
     private final Creek api;
     private final List<CreekExtensionProvider> extensionProviders;
+    private final ResourceInitializerFactory resourceInitializerFactory;
     private Optional<Clock> explicitClock = Optional.empty();
 
     public ContextBuilder(
@@ -63,6 +65,7 @@ public final class ContextBuilder implements CreekServices.Builder {
                 component,
                 api,
                 extensionProviders,
+                ResourceInitializer::resourceInitializer,
                 Context::new,
                 Thread::setDefaultUncaughtExceptionHandler,
                 () -> System.exit(-1));
@@ -73,12 +76,15 @@ public final class ContextBuilder implements CreekServices.Builder {
             final ComponentDescriptor component,
             final Creek api,
             final List<CreekExtensionProvider> extensionProviders,
+            final ResourceInitializerFactory resourceInitializerFactory,
             final ContextFactory contextFactory,
             final UnhandledExceptionHandlerInstaller unhandledExceptionHandlerInstaller,
             final Runnable systemExit) {
         this.api = requireNonNull(api, "api");
         this.extensionProviders =
                 List.copyOf(requireNonNull(extensionProviders, "extensionProviders"));
+        this.resourceInitializerFactory =
+                requireNonNull(resourceInitializerFactory, "resourceInitializerFactory");
         this.contextFactory = requireNonNull(contextFactory, "contextFactory");
         this.unhandledExceptionHandlerInstaller =
                 requireNonNull(
@@ -107,6 +113,9 @@ public final class ContextBuilder implements CreekServices.Builder {
         final CreekContext ctx = contextFactory.build(createClock(), extensions);
         throwOnUnsupportedResourceType(extensions);
         throwOnUnusedOptionType(extensions);
+
+        resourceInitializer().service(List.of(component));
+
         return ctx;
     }
 
@@ -181,6 +190,10 @@ public final class ContextBuilder implements CreekServices.Builder {
         }
     }
 
+    private ResourceInitializer resourceInitializer() {
+        return resourceInitializerFactory.build(api.model()::resourceHandler);
+    }
+
     private static CreekExtension throwOnExtensionTypeClash(final List<CreekExtension> extensions) {
         if (extensions.size() == 1) {
             return extensions.get(0);
@@ -240,6 +253,11 @@ public final class ContextBuilder implements CreekServices.Builder {
     @VisibleForTesting
     interface ContextFactory {
         CreekContext build(Clock clock, Collection<CreekExtension> extensions);
+    }
+
+    @VisibleForTesting
+    interface ResourceInitializerFactory {
+        ResourceInitializer build(ResourceInitializer.ResourceHandlers handlers);
     }
 
     @VisibleForTesting

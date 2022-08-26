@@ -19,13 +19,14 @@ package org.creekservice.test.api.java.nine.service.extension;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.util.Collection;
 import org.creekservice.api.platform.metadata.ComponentInternal;
 import org.creekservice.api.platform.metadata.ComponentOutput;
+import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
-import org.creekservice.api.service.extension.model.ResourceHandler;
 
 public final class JavaNineExtensionProvider2 implements CreekExtensionProvider {
 
@@ -38,9 +39,21 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
         return new Extension(creek.service());
     }
 
-    private static final class InternalHandler implements ResourceHandler<Internal> {}
+    private static final class InternalHandler implements ResourceHandler<Internal> {
+        @Override
+        public void validate(final Collection<Internal> resourceGroup) {}
 
-    private static final class OutputHandler implements ResourceHandler<Output> {}
+        @Override
+        public void ensure(final Collection<Internal> resources) {}
+    }
+
+    private static final class OutputHandler implements ResourceHandler<Output> {
+        @Override
+        public void validate(final Collection<Output> resourceGroup) {}
+
+        @Override
+        public void ensure(final Collection<Output> resources) {}
+    }
 
     public static final class Extension implements CreekExtension {
 

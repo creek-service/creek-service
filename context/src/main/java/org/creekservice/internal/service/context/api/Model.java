@@ -26,9 +26,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.creekservice.api.base.annotation.VisibleForTesting;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
+import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.model.ModelContainer;
-import org.creekservice.api.service.extension.model.ResourceHandler;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class Model implements ModelContainer {
@@ -75,7 +75,7 @@ public final class Model implements ModelContainer {
         return resourceExtension(type).isPresent();
     }
 
-    public <T extends ResourceDescriptor> ResourceHandler<? super T> resourceHandler(
+    public <T extends ResourceDescriptor> ResourceHandler<T> resourceHandler(
             final Class<T> resourceType) {
         throwIfNotOnCorrectThread();
         return resourceExtension(resourceType)
@@ -146,13 +146,14 @@ public final class Model implements ModelContainer {
         }
     }
 
-    private static final class ResourceExtension<T> {
-        final ResourceHandler<? super T> handler;
+    private static final class ResourceExtension<T extends ResourceDescriptor> {
+        final ResourceHandler<T> handler;
         final CreekExtensionProvider provider;
 
+        @SuppressWarnings("unchecked")
         private ResourceExtension(
                 final ResourceHandler<? super T> handler, final CreekExtensionProvider provider) {
-            this.handler = requireNonNull(handler, "handler");
+            this.handler = (ResourceHandler<T>) requireNonNull(handler, "handler");
             this.provider = requireNonNull(provider, "provider");
         }
     }

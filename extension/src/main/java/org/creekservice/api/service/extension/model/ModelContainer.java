@@ -18,6 +18,7 @@ package org.creekservice.api.service.extension.model;
 
 
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
+import org.creekservice.api.platform.metadata.ResourceHandler;
 
 /** A mutable container of extensions to the Creek System-test model. */
 public interface ModelContainer extends ModelCollection {
