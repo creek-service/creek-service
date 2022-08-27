@@ -19,14 +19,6 @@ allprojects {
     apply(plugin = "com.github.spotbugs")
     apply(plugin = "org.javamodularity.moduleplugin")
 
-    configure(subprojects
-            // Exclude test modules from code coverage
-            - project(":test-java-eight-extension")
-            - project(":test-java-nine-extension")
-    ) {
-        apply(plugin = "jacoco")
-    }
-
     group = "org.creekservice"
 
     java {
@@ -53,6 +45,12 @@ allprojects {
 subprojects {
     apply(plugin = "maven-publish")
 
+    if (name != "test-java-eight-extension"
+        && name != "test-java-nine-extension"
+    ) {
+        apply(plugin = "jacoco")
+    }
+
     project.version = project.parent?.version!!
 
     extra.apply {
@@ -63,7 +61,7 @@ subprojects {
         set("spotBugsVersion", "4.7.1")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 
         set("log4jVersion", "2.18.0")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-        set("guavaVersion", "31.1-jre")       // https://mvnrepository.com/artifact/com.google.guava/guava
+        set("guavaVersion", "31.1-jre")         // https://mvnrepository.com/artifact/com.google.guava/guava
         set("junitVersion", "5.9.0")            // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
         set("junitPioneerVersion", "1.7.1")     // https://mvnrepository.com/artifact/org.junit-pioneer/junit-pioneer
         set("mockitoVersion", "4.7.0")          // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
@@ -153,24 +151,26 @@ subprojects {
         dependsOn("checkstyleMain", "checkstyleTest", "spotbugsMain", "spotbugsTest")
     }
 
-    publishing {
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/creek-service/${rootProject.name}")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
+    if (!name.startsWith("test-")) {
+        publishing {
+            repositories {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/creek-service/${rootProject.name}")
+                    credentials {
+                        username = System.getenv("GITHUB_ACTOR")
+                        password = System.getenv("GITHUB_TOKEN")
+                    }
                 }
             }
-        }
-        publications {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-                artifactId = "${rootProject.name}-${project.name}"
+            publications {
+                create<MavenPublication>("maven") {
+                    from(components["java"])
+                    artifactId = "${rootProject.name}-${project.name}"
 
-                pom {
-                    url.set("https://github.com/creek-service/${rootProject.name}.git")
+                    pom {
+                        url.set("https://github.com/creek-service/${rootProject.name}.git")
+                    }
                 }
             }
         }
