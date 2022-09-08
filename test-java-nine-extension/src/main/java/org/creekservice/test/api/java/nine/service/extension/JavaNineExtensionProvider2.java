@@ -35,6 +35,7 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
         creek.model()
                 .addResource(Internal.class, new InternalHandler())
                 .addResource(Output.class, new OutputHandler());
+                
 
         return new Extension(creek.service());
     }
