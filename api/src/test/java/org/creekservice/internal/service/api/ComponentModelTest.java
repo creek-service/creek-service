@@ -17,6 +17,7 @@
 package org.creekservice.internal.service.api;
 
 import static java.lang.System.lineSeparator;
+import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
@@ -216,28 +218,42 @@ class ComponentModelTest {
         assertThat(
                 e.getMessage(),
                 matchesRegex(
-                        quote(
-                                        "Unknown resource descriptor type: "
-                                                + TestResource.class.getName()
-                                                + lineSeparator()
-                                                + "Are you missing a Creek extension on the class or module path?"
-                                                + lineSeparator()
-                                                + "Known resource types: ["
-                                                + lineSeparator())
-                                + ".*"
-                                + quote(lineSeparator() + "]")));
+                        compile(
+                                quote(
+                                                "Unknown resource descriptor type: "
+                                                        + TestResource.class.getName()
+                                                        + lineSeparator()
+                                                        + "Are you missing a Creek extension on the class or module path?"
+                                                        + lineSeparator()
+                                                        + "Known resource types: ["
+                                                        + lineSeparator())
+                                        + ".*"
+                                        + quote(lineSeparator() + "]"),
+                                Pattern.DOTALL)));
 
         assertThat(
                 e.getMessage(),
                 matchesRegex(
-                        quote(lineSeparator() + "\t" + TestResource2.class.getName())
-                                + " \\(file:/.*\\)"));
+                        compile(
+                                ".*"
+                                        + quote(
+                                                lineSeparator()
+                                                        + "\t"
+                                                        + TestResource2.class.getName())
+                                        + " \\(file:/[^)]*\\).*",
+                                Pattern.DOTALL)));
 
         assertThat(
                 e.getMessage(),
                 matchesRegex(
-                        quote("," + lineSeparator() + "\t" + TestResource3.class.getName())
-                                + " \\(file:/.*\\)"));
+                        compile(
+                                ".*"
+                                        + quote(
+                                                lineSeparator()
+                                                        + "\t"
+                                                        + TestResource3.class.getName())
+                                        + " \\(file:/[^)]*\\).*",
+                                Pattern.DOTALL)));
     }
 
     @ParameterizedTest(name = "[" + INDEX_PLACEHOLDER + "] {0}")
