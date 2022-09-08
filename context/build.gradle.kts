@@ -8,7 +8,7 @@ val creekObsVersion : String by extra
 val spotBugsVersion : String by extra
 
 dependencies {
-    api(project(":extension"))
+    api(project(":api"))
     api("org.creekservice:creek-base-annotation:$creekBaseVersion")
     api("org.creekservice:creek-base-type:$creekBaseVersion")
 

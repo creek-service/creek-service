@@ -39,7 +39,7 @@ import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
-import org.creekservice.internal.service.context.api.Creek;
+import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

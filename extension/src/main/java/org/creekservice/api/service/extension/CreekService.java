@@ -18,7 +18,7 @@ package org.creekservice.api.service.extension;
 
 
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
-import org.creekservice.api.service.extension.model.ModelContainer;
+import org.creekservice.api.service.extension.model.ComponentModelContainer;
 import org.creekservice.api.service.extension.option.OptionCollection;
 
 /** The entry point to the API Creek exposes to service extensions. */
@@ -40,7 +40,7 @@ public interface CreekService {
      *
      * @return the model.
      */
-    ModelContainer model();
+    ComponentModelContainer model();
 
     /** @return the descriptor of the service being initialized. */
     ServiceDescriptor service();

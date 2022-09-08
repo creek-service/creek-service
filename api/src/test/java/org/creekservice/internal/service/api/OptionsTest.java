@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.context.api;
+package org.creekservice.internal.service.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -68,7 +68,7 @@ class OptionsTest {
                 e.getMessage(),
                 is(
                         "Option of supplied type is already registered. "
-                                + "type: org.creekservice.internal.service.context.api.OptionsTest$TestOptionsA"));
+                                + "type: org.creekservice.internal.service.api.OptionsTest$TestOptionsA"));
     }
 
     @Test

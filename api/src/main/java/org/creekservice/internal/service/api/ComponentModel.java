@@ -14,41 +14,43 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.context.api;
+package org.creekservice.internal.service.api;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
+import static org.creekservice.api.base.type.CodeLocation.codeLocation;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.creekservice.api.base.annotation.VisibleForTesting;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
-import org.creekservice.api.service.extension.CreekExtensionProvider;
-import org.creekservice.api.service.extension.model.ModelContainer;
+import org.creekservice.api.service.extension.model.ComponentModelContainer;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public final class Model implements ModelContainer {
+public final class ComponentModel implements ComponentModelContainer {
 
     private final long threadId;
     private final Map<Class<? extends ResourceDescriptor>, ResourceExtension<?>>
             resourceExtensions = new HashMap<>();
-    private Optional<CreekExtensionProvider> currentProvider = Optional.empty();
 
-    public Model() {
+    private Optional<?> currentSource = Optional.empty();
+
+    public ComponentModel() {
         this(Thread.currentThread().getId());
     }
 
     @VisibleForTesting
-    Model(final long threadId) {
+    ComponentModel(final long threadId) {
         this.threadId = threadId;
     }
 
     @Override
-    public <T extends ResourceDescriptor> ModelContainer addResource(
+    public <T extends ResourceDescriptor> ComponentModelContainer addResource(
             final Class<T> type, final ResourceHandler<? super T> handler) {
         throwIfNotOnCorrectThread();
 
@@ -57,14 +59,17 @@ public final class Model implements ModelContainer {
             throw new IllegalArgumentException(
                     "Handler already registered for type: "
                             + type.getName()
-                            + ", registering provider: "
-                            + existing.provider);
+                            + ", registered by: "
+                            + existing.source
+                            + "("
+                            + codeLocation(existing.source)
+                            + ")");
         }
 
         resourceExtensions.put(
                 type,
                 new ResourceExtension<>(
-                        handler, currentProvider.orElseThrow(NotWithinInitializeException::new)));
+                        handler, currentSource.orElseThrow(NotWithinInitializeException::new)));
         return this;
     }
 
@@ -80,13 +85,16 @@ public final class Model implements ModelContainer {
         throwIfNotOnCorrectThread();
         return resourceExtension(resourceType)
                 .map(ext -> ext.handler)
-                .orElseThrow(() -> new UnsupportedResourceTypesException(resourceType));
+                .orElseThrow(
+                        () ->
+                                new UnsupportedResourceTypesException(
+                                        resourceType, resourceExtensions.keySet()));
     }
 
-    public void initializing(final Optional<CreekExtensionProvider> provider) {
+    public void initializing(final Optional<?> source) {
         throwIfNotOnCorrectThread();
 
-        currentProvider = requireNonNull(provider, "provider");
+        currentSource = requireNonNull(source, "source");
     }
 
     @SuppressWarnings("unchecked")
@@ -120,7 +128,7 @@ public final class Model implements ModelContainer {
                                                 e ->
                                                         e.getKey().getSimpleName()
                                                                 + " ("
-                                                                + e.getValue().provider
+                                                                + e.getValue().source
                                                                 + ")")
                                         .sorted()
                                         .collect(Collectors.joining(", ", "[", "]")));
@@ -148,24 +156,38 @@ public final class Model implements ModelContainer {
 
     private static final class ResourceExtension<T extends ResourceDescriptor> {
         final ResourceHandler<T> handler;
-        final CreekExtensionProvider provider;
+        final Object source;
 
         @SuppressWarnings("unchecked")
-        private ResourceExtension(
-                final ResourceHandler<? super T> handler, final CreekExtensionProvider provider) {
+        private ResourceExtension(final ResourceHandler<? super T> handler, final Object source) {
             this.handler = (ResourceHandler<T>) requireNonNull(handler, "handler");
-            this.provider = requireNonNull(provider, "provider");
+            this.source = requireNonNull(source, "provider");
         }
     }
 
     private static final class UnsupportedResourceTypesException extends RuntimeException {
 
-        UnsupportedResourceTypesException(final Class<? extends ResourceDescriptor> type) {
+        UnsupportedResourceTypesException(
+                final Class<? extends ResourceDescriptor> type,
+                final Set<Class<? extends ResourceDescriptor>> known) {
             super(
                     "Unknown resource descriptor type: "
                             + type.getName()
                             + lineSeparator()
-                            + "Are you missing a Creek extension on the class or module path?");
+                            + "Are you missing a Creek extension on the class or module path?"
+                            + lineSeparator()
+                            + "Known resource types: "
+                            + format(known));
+        }
+
+        private static String format(final Set<Class<? extends ResourceDescriptor>> known) {
+            return known.stream()
+                    .map(t -> "\t" + t.getName() + " (" + codeLocation(t) + ")")
+                    .collect(
+                            Collectors.joining(
+                                    "," + lineSeparator(),
+                                    "[" + lineSeparator(),
+                                    lineSeparator() + "]"));
         }
     }
 

@@ -46,11 +46,11 @@ import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.internal.service.api.ComponentModel;
+import org.creekservice.internal.service.api.Creek;
+import org.creekservice.internal.service.api.Options;
 import org.creekservice.internal.service.context.ContextBuilder.ContextFactory;
 import org.creekservice.internal.service.context.ContextBuilder.UnhandledExceptionHandlerInstaller;
-import org.creekservice.internal.service.context.api.Creek;
-import org.creekservice.internal.service.context.api.Model;
-import org.creekservice.internal.service.context.api.Options;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
 import org.creekservice.internal.service.context.temporal.TestClock;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +73,7 @@ class ContextBuilderTest {
     @Mock private Creek api;
     @Mock private Creek initializingApi;
     @Mock private Options options;
-    @Mock private Model model;
+    @Mock private ComponentModel model;
     @Mock private ComponentDescriptor component;
     @Mock private ResourceA res0;
     @Mock private ResourceB res1;
@@ -197,6 +197,22 @@ class ContextBuilderTest {
         inOrder.verify(api).initializing(Optional.empty());
         inOrder.verify(api).initializing(Optional.of(extProvider1));
         inOrder.verify(api).initializing(Optional.empty());
+    }
+
+    @Test
+    void shouldClearInitializingExtensionOnException() {
+        // Given:
+        final RuntimeException expected = new RuntimeException("boom");
+        doThrow(expected).when(extProvider0).initialize(any());
+
+        // When:
+        final Exception e = assertThrows(RuntimeException.class, () -> ctxBuilder.build());
+
+        // Then:
+        final InOrder inOrder = Mockito.inOrder(api);
+        inOrder.verify(api).initializing(Optional.of(extProvider0));
+        inOrder.verify(api).initializing(Optional.empty());
+        assertThat(e, is(expected));
     }
 
     @Test

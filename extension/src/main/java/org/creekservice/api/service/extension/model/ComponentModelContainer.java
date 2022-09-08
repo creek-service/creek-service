@@ -20,8 +20,8 @@ package org.creekservice.api.service.extension.model;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
 
-/** A mutable container of extensions to the Creek System-test model. */
-public interface ModelContainer extends ModelCollection {
+/** A mutable container of extensions to the Creek Service component model. */
+public interface ComponentModelContainer extends ComponentModelCollection {
 
     /**
      * Register a custom resource type with Creek.
@@ -35,6 +35,6 @@ public interface ModelContainer extends ModelCollection {
      * @param type the custom recourse type.
      * @return self, to allow for method chaining.
      */
-    <T extends ResourceDescriptor> ModelContainer addResource(
+    <T extends ResourceDescriptor> ComponentModelContainer addResource(
             Class<T> type, ResourceHandler<? super T> handler);
 }
