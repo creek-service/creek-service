@@ -1,6 +1,7 @@
 rootProject.name = "creek-service"
 
 include(
+    "api",
     "extension",
     "context",
     "test-java-eight",

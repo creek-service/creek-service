@@ -21,8 +21,8 @@ import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProviders;
+import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.context.ContextBuilder;
-import org.creekservice.internal.service.context.api.Creek;
 
 /** Defines the entry point for initialising Creek and getting hold of a {@link CreekContext}. */
 public final class CreekServices {

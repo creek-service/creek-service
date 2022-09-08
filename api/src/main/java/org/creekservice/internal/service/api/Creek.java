@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.context.api;
+package org.creekservice.internal.service.api;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,16 +28,16 @@ import org.creekservice.api.service.extension.CreekService;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class Creek implements CreekService {
 
-    private final Model model;
+    private final ComponentModel model;
     private final Options options;
     private final ServiceDescriptor service;
 
     public Creek(final ServiceDescriptor service) {
-        this(service, new Options(), new Model());
+        this(service, new Options(), new ComponentModel());
     }
 
     @VisibleForTesting
-    Creek(final ServiceDescriptor service, final Options options, final Model model) {
+    Creek(final ServiceDescriptor service, final Options options, final ComponentModel model) {
         this.service = requireNonNull(service, "service");
         this.options = requireNonNull(options, "options");
         this.model = requireNonNull(model, "model");
@@ -51,7 +51,7 @@ public final class Creek implements CreekService {
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "intentional exposure")
     @Override
-    public Model model() {
+    public ComponentModel model() {
         return model;
     }
 

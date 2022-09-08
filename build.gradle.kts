@@ -92,7 +92,7 @@ subprojects {
     }
 
     tasks.compileJava {
-        options.compilerArgs.add("-Xlint:all,-serial,-requires-automatic,-requires-transitive-automatic")
+        options.compilerArgs.add("-Xlint:all,-serial,-requires-automatic,-requires-transitive-automatic,-module")
         options.compilerArgs.add("-Werror")
     }
 

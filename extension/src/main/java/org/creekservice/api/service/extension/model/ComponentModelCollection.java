@@ -19,8 +19,8 @@ package org.creekservice.api.service.extension.model;
 
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 
-/** A collection of extensions to the Creek System-test model: */
-public interface ModelCollection {
+/** A collection of extensions to the Creek Service component model: */
+public interface ComponentModelCollection {
 
     /**
      * The model collection knows about the supplied extension {@code type}.

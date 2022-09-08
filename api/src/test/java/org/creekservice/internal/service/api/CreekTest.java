@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.context.api;
+package org.creekservice.internal.service.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -32,7 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CreekTest {
 
-    @Mock private Model model;
+    @Mock private ComponentModel model;
     @Mock private Options options;
     @Mock private ServiceDescriptor service;
     @Mock private CreekExtensionProvider provider;

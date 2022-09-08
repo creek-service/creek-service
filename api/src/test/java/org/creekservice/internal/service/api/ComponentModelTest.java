@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.context.api;
+package org.creekservice.internal.service.api;
 
+import static java.lang.System.lineSeparator;
+import static java.util.regex.Pattern.quote;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesRegex;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
 import static org.mockito.Mockito.mock;
@@ -41,9 +45,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ModelTest {
+class ComponentModelTest {
 
-    private Model model;
+    private ComponentModel model;
     @Mock private CreekExtensionProvider provider;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler1;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler2;
@@ -51,7 +55,7 @@ class ModelTest {
 
     @BeforeEach
     void setUp() {
-        model = new Model();
+        model = new ComponentModel();
         model.initializing(Optional.of(provider));
     }
 
@@ -147,7 +151,7 @@ class ModelTest {
                 e.getMessage(),
                 is(
                         "Unable to determine most specific resource handler for type: "
-                                + "org.creekservice.internal.service.context.api.ModelTest$TestResource4. "
+                                + "org.creekservice.internal.service.api.ComponentModelTest$TestResource4. "
                                 + "Could be any handler for any type in [BaseResource (provider), BaseResource2 (provider)]"));
     }
 
@@ -165,10 +169,10 @@ class ModelTest {
         // Then:
         assertThat(
                 e.getMessage(),
-                is(
+                startsWith(
                         "Handler already registered for type: "
-                                + "org.creekservice.internal.service.context.api.ModelTest$BaseResource, "
-                                + "registering provider: provider"));
+                                + "org.creekservice.internal.service.api.ComponentModelTest$BaseResource, "
+                                + "registered by: provider"));
     }
 
     @Test
@@ -199,6 +203,10 @@ class ModelTest {
 
     @Test
     void shouldThrowIfResourceHandlerNotRegistered() {
+        // Given:
+        model.addResource(TestResource2.class, handler1);
+        model.addResource(TestResource3.class, handler1);
+
         // When:
         final Exception e =
                 assertThrows(
@@ -207,18 +215,32 @@ class ModelTest {
         // Then:
         assertThat(
                 e.getMessage(),
-                is(
-                        "Unknown resource descriptor type: "
-                                + "org.creekservice.internal.service.context.api.ModelTest$TestResource"
-                                + System.lineSeparator()
-                                + "Are you missing a Creek extension on the class or module path?"));
+                matchesRegex(
+                        quote(
+                                        "Unknown resource descriptor type: "
+                                                + TestResource.class.getName()
+                                                + lineSeparator()
+                                                + "Are you missing a Creek extension on the class or module path?"
+                                                + lineSeparator()
+                                                + "Known resource types: ["
+                                                + lineSeparator()
+                                                + "\t"
+                                                + TestResource2.class.getName())
+                                + " \\(file:/.*\\)"
+                                + quote(
+                                        ","
+                                                + lineSeparator()
+                                                + "\t"
+                                                + TestResource3.class.getName())
+                                + " \\(file:/.*\\)"
+                                + quote(lineSeparator() + "]")));
     }
 
     @ParameterizedTest(name = "[" + INDEX_PLACEHOLDER + "] {0}")
     @MethodSource("publicMethods")
-    void shouldThrowIfWrongThread(final String ignored, final Consumer<Model> method) {
+    void shouldThrowIfWrongThread(final String ignored, final Consumer<ComponentModel> method) {
         // Given:
-        model = new Model(Thread.currentThread().getId() + 1);
+        model = new ComponentModel(Thread.currentThread().getId() + 1);
 
         // Then:
         assertThrows(ConcurrentModificationException.class, () -> method.accept(model));
@@ -236,21 +258,23 @@ class ModelTest {
         return Stream.of(
                 Arguments.of(
                         "addResource",
-                        (Consumer<Model>)
+                        (Consumer<ComponentModel>)
                                 m ->
                                         m.addResource(
                                                 TestResource.class, mock(ResourceHandler.class))),
-                Arguments.of("hasType", (Consumer<Model>) m -> m.hasType(TestResource.class)),
+                Arguments.of(
+                        "hasType", (Consumer<ComponentModel>) m -> m.hasType(TestResource.class)),
                 Arguments.of(
                         "resourceHandler",
-                        (Consumer<Model>) m -> m.resourceHandler(TestResource.class)),
+                        (Consumer<ComponentModel>) m -> m.resourceHandler(TestResource.class)),
                 Arguments.of(
-                        "initializing", (Consumer<Model>) m -> m.initializing(Optional.empty())));
+                        "initializing",
+                        (Consumer<ComponentModel>) m -> m.initializing(Optional.empty())));
     }
 
     private int publicMethodCount() {
         return (int)
-                Arrays.stream(Model.class.getMethods())
+                Arrays.stream(ComponentModel.class.getMethods())
                         .filter(m -> !m.getDeclaringClass().equals(Object.class))
                         .count();
     }
