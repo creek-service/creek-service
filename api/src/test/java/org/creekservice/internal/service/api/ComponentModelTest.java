@@ -223,17 +223,21 @@ class ComponentModelTest {
                                                 + "Are you missing a Creek extension on the class or module path?"
                                                 + lineSeparator()
                                                 + "Known resource types: ["
-                                                + lineSeparator()
-                                                + "\t"
-                                                + TestResource2.class.getName())
-                                + " \\(file:/.*\\)"
-                                + quote(
-                                        ","
-                                                + lineSeparator()
-                                                + "\t"
-                                                + TestResource3.class.getName())
-                                + " \\(file:/.*\\)"
+                                                + lineSeparator())
+                                + ".*"
                                 + quote(lineSeparator() + "]")));
+
+        assertThat(
+                e.getMessage(),
+                matchesRegex(
+                        quote(lineSeparator() + "\t" + TestResource2.class.getName())
+                                + " \\(file:/.*\\)"));
+
+        assertThat(
+                e.getMessage(),
+                matchesRegex(
+                        quote("," + lineSeparator() + "\t" + TestResource3.class.getName())
+                                + " \\(file:/.*\\)"));
     }
 
     @ParameterizedTest(name = "[" + INDEX_PLACEHOLDER + "] {0}")
