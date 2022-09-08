@@ -41,18 +41,18 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
 
     private static final class InternalHandler implements ResourceHandler<Internal> {
         @Override
-        public void validate(final Collection<Internal> resourceGroup) {}
+        public void validate(final Collection<? extends Internal> resourceGroup) {}
 
         @Override
-        public void ensure(final Collection<Internal> resources) {}
+        public void ensure(final Collection<? extends Internal> resources) {}
     }
 
     private static final class OutputHandler implements ResourceHandler<Output> {
         @Override
-        public void validate(final Collection<Output> resourceGroup) {}
+        public void validate(final Collection<? extends Output> resourceGroup) {}
 
         @Override
-        public void ensure(final Collection<Output> resources) {}
+        public void ensure(final Collection<? extends Output> resources) {}
     }
 
     public static final class Extension implements CreekExtension {

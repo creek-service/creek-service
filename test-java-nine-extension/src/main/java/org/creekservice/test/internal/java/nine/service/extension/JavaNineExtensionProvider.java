@@ -38,9 +38,9 @@ public final class JavaNineExtensionProvider implements CreekExtensionProvider {
 
     private static final class InputHandler implements ResourceHandler<JavaNineExtensionInput> {
         @Override
-        public void validate(final Collection<JavaNineExtensionInput> resourceGroup) {}
+        public void validate(final Collection<? extends JavaNineExtensionInput> resourceGroup) {}
 
         @Override
-        public void ensure(final Collection<JavaNineExtensionInput> resources) {}
+        public void ensure(final Collection<? extends JavaNineExtensionInput> resources) {}
     }
 }
