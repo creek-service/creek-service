@@ -19,25 +19,31 @@ package org.creekservice.internal.service.api;
 import static java.util.Objects.requireNonNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import java.util.Optional;
 import org.creekservice.api.base.annotation.VisibleForTesting;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
+import org.creekservice.internal.service.api.component.Components;
+import org.creekservice.internal.service.api.model.ComponentModel;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class Creek implements CreekService {
 
     private final ComponentModel model;
     private final Options options;
+    private final Components components;
 
-    public Creek() {
-        this(new Options(), new ComponentModel());
+    public Creek(final Collection<? extends ComponentDescriptor> components) {
+        this(new Options(), new ComponentModel(), new Components(components));
     }
 
     @VisibleForTesting
-    Creek(final Options options, final ComponentModel model) {
+    Creek(final Options options, final ComponentModel model, final Components components) {
         this.options = requireNonNull(options, "options");
         this.model = requireNonNull(model, "model");
+        this.components = requireNonNull(components, "components");
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "intentional exposure")
@@ -50,6 +56,12 @@ public final class Creek implements CreekService {
     @Override
     public ComponentModel model() {
         return model;
+    }
+
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "intentional exposure")
+    @Override
+    public Components components() {
+        return components;
     }
 
     public void initializing(final Optional<CreekExtensionProvider> provider) {

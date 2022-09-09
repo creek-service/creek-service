@@ -22,6 +22,8 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.internal.service.api.component.Components;
+import org.creekservice.internal.service.api.model.ComponentModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,12 +35,13 @@ class CreekTest {
 
     @Mock private ComponentModel model;
     @Mock private Options options;
+    @Mock private Components components;
     @Mock private CreekExtensionProvider provider;
     private Creek api;
 
     @BeforeEach
     void setUp() {
-        api = new Creek(options, model);
+        api = new Creek(options, model, components);
     }
 
     @Test
@@ -49,6 +52,11 @@ class CreekTest {
     @Test
     void shouldExposeModel() {
         assertThat(api.model(), is(model));
+    }
+
+    @Test
+    void shouldExposeComponents() {
+        assertThat(api.components(), is(components));
     }
 
     @Test

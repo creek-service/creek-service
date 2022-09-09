@@ -46,9 +46,9 @@ import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
-import org.creekservice.internal.service.api.ComponentModel;
 import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.api.Options;
+import org.creekservice.internal.service.api.model.ComponentModel;
 import org.creekservice.internal.service.context.ContextBuilder.ContextFactory;
 import org.creekservice.internal.service.context.ContextBuilder.UnhandledExceptionHandlerInstaller;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
@@ -102,10 +102,10 @@ class ContextBuilderTest {
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
         when(contextFactory.build(any(), any())).thenReturn(ctx);
 
-        when(extProvider0.initialize(any(), any())).thenReturn(ext0);
+        when(extProvider0.initialize(any())).thenReturn(ext0);
         when(ext0.name()).thenReturn("provider0");
 
-        when(extProvider1.initialize(any(), any())).thenReturn(ext1);
+        when(extProvider1.initialize(any())).thenReturn(ext1);
         when(ext1.name()).thenReturn("provider1");
 
         when(resourceInitializerFactory.build(any())).thenReturn(resourceInitializer);
@@ -180,8 +180,8 @@ class ContextBuilderTest {
         ctxBuilder.build();
 
         // Then:
-        verify(extProvider0).initialize(api, List.of(component));
-        verify(extProvider1).initialize(api, List.of(component));
+        verify(extProvider0).initialize(api);
+        verify(extProvider1).initialize(api);
     }
 
     @Test
@@ -201,7 +201,7 @@ class ContextBuilderTest {
     void shouldClearInitializingExtensionOnException() {
         // Given:
         final RuntimeException expected = new RuntimeException("boom");
-        doThrow(expected).when(extProvider0).initialize(any(), any());
+        doThrow(expected).when(extProvider0).initialize(any());
 
         // When:
         final Exception e = assertThrows(RuntimeException.class, () -> ctxBuilder.build());
@@ -281,7 +281,7 @@ class ContextBuilderTest {
     @Test
     void shouldThrowHelpfulExceptionOnMultipleImplsOfSameExtension() {
         // Given:
-        when(extProvider1.initialize(any(), any())).thenReturn(ext0);
+        when(extProvider1.initialize(any())).thenReturn(ext0);
 
         // When:
         final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);

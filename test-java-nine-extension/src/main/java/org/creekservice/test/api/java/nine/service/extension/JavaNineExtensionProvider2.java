@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.ComponentInternal;
 import org.creekservice.api.platform.metadata.ComponentOutput;
@@ -32,13 +33,12 @@ import org.creekservice.api.service.extension.CreekService;
 public final class JavaNineExtensionProvider2 implements CreekExtensionProvider {
 
     @Override
-    public Extension initialize(
-            final CreekService api, final Collection<? extends ComponentDescriptor> components) {
+    public Extension initialize(final CreekService api) {
         api.model()
                 .addResource(Internal.class, new InternalHandler())
                 .addResource(Output.class, new OutputHandler());
 
-        return new Extension(components);
+        return new Extension(api.components().stream().collect(Collectors.toList()));
     }
 
     private static final class InternalHandler implements ResourceHandler<Internal> {

@@ -17,8 +17,6 @@
 package org.creekservice.test.java.eight.service.extension;
 
 
-import java.util.Collection;
-import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
@@ -26,8 +24,7 @@ import org.creekservice.api.service.extension.CreekService;
 public final class JavaEightExtensionProvider implements CreekExtensionProvider {
 
     @Override
-    public CreekExtension initialize(
-            final CreekService api, final Collection<? extends ComponentDescriptor> components) {
+    public CreekExtension initialize(final CreekService api) {
         return new Extension();
     }
 

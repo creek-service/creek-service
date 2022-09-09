@@ -17,6 +17,7 @@
 package org.creekservice.api.service.extension;
 
 
+import org.creekservice.api.service.extension.component.ComponentDescriptors;
 import org.creekservice.api.service.extension.model.ComponentModelContainer;
 import org.creekservice.api.service.extension.option.OptionCollection;
 
@@ -40,4 +41,17 @@ public interface CreekService {
      * @return the model.
      */
     ComponentModelContainer model();
+
+    /**
+     * The descriptors of components.
+     *
+     * <p>If running within the context of a microservice, this will return a single {@link
+     * org.creekservice.api.platform.metadata.ServiceDescriptor}.
+     *
+     * <p>If running within the context of the system tests, this will contain all the components
+     * the system test is aware of.
+     *
+     * @return component descriptor collection.
+     */
+    ComponentDescriptors components();
 }

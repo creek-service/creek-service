@@ -16,10 +16,6 @@
 
 package org.creekservice.api.service.extension;
 
-
-import java.util.Collection;
-import org.creekservice.api.platform.metadata.ComponentDescriptor;
-
 /**
  * Provider of an extension to Creek.
  *
@@ -39,18 +35,20 @@ public interface CreekExtensionProvider {
     /**
      * Called to allow the instance to initialise.
      *
-     * <p>The instance can register custom resource types, add listeners, access user provided
+     * <p>Extensions can register custom resource types, add listeners, access user provided
      * options, and perform any initialisation needed for the returned extension.
      *
-     * <p>The {@code components} parameter will contain a single {@link
-     * org.creekservice.api.platform.metadata.ServiceDescriptor} if the extension is being
-     * initialised as part of a normal microservice starting up, or multiple components if being
-     * initialised as part of the system tests.
+     * <p>Extensions should also validate the resources of all {@link CreekService#components()
+     * components} that the extension supports, and ensure any internal state to handle those
+     * resources is initialised.
+     *
+     * <p>Where multiple resource descriptors describe the same resource, i.e. their {@link
+     * org.creekservice.api.platform.metadata.ResourceDescriptor#id() id} is the same, extensions
+     * should validate that all descriptors agree on the details, and throw a suitable exception
+     * describing any discrepancies.
      *
      * @param api the API Creek exposes to extensions.
-     * @param components the component or components to initialize the extension for.
      * @return the initialized extension.
      */
-    CreekExtension initialize(
-            CreekService api, Collection<? extends ComponentDescriptor> components);
+    CreekExtension initialize(CreekService api);
 }

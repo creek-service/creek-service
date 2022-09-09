@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.api;
+package org.creekservice.internal.service.api.model;
 
 import static java.lang.System.lineSeparator;
 import static java.util.regex.Pattern.compile;
@@ -153,7 +153,7 @@ class ComponentModelTest {
                 e.getMessage(),
                 is(
                         "Unable to determine most specific resource handler for type: "
-                                + "org.creekservice.internal.service.api.ComponentModelTest$TestResource4. "
+                                + "org.creekservice.internal.service.api.model.ComponentModelTest$TestResource4. "
                                 + "Could be any handler for any type in [BaseResource (provider), BaseResource2 (provider)]"));
     }
 
@@ -173,7 +173,7 @@ class ComponentModelTest {
                 e.getMessage(),
                 startsWith(
                         "Handler already registered for type: "
-                                + "org.creekservice.internal.service.api.ComponentModelTest$BaseResource, "
+                                + "org.creekservice.internal.service.api.model.ComponentModelTest$BaseResource, "
                                 + "registered by: provider"));
     }
 
