@@ -18,8 +18,10 @@ package org.creekservice.test.api.java.nine.service.extension;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import org.creekservice.api.platform.metadata.ServiceDescriptor;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.service.extension.CreekExtension;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -27,12 +29,13 @@ public final class JavaNineExtension implements CreekExtension {
 
     public static final String NAME = "java9";
 
-    private final ServiceDescriptor service;
+    private final Collection<? extends ComponentDescriptor> components;
     private final Optional<JavaNineExtensionOptions> options;
 
     public JavaNineExtension(
-            final ServiceDescriptor service, final Optional<JavaNineExtensionOptions> options) {
-        this.service = requireNonNull(service, "service");
+            final Collection<? extends ComponentDescriptor> components,
+            final Optional<JavaNineExtensionOptions> options) {
+        this.components = requireNonNull(components, "components");
         this.options = requireNonNull(options, "options");
     }
 
@@ -41,8 +44,8 @@ public final class JavaNineExtension implements CreekExtension {
         return NAME;
     }
 
-    public ServiceDescriptor serviceDescriptor() {
-        return service;
+    public Collection<? extends ComponentDescriptor> components() {
+        return List.copyOf(components);
     }
 
     public Optional<JavaNineExtensionOptions> options() {

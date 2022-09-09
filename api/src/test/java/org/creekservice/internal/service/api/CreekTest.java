@@ -21,7 +21,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
-import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,13 +33,12 @@ class CreekTest {
 
     @Mock private ComponentModel model;
     @Mock private Options options;
-    @Mock private ServiceDescriptor service;
     @Mock private CreekExtensionProvider provider;
     private Creek api;
 
     @BeforeEach
     void setUp() {
-        api = new Creek(service, options, model);
+        api = new Creek(options, model);
     }
 
     @Test
@@ -51,11 +49,6 @@ class CreekTest {
     @Test
     void shouldExposeModel() {
         assertThat(api.model(), is(model));
-    }
-
-    @Test
-    void shouldExposeService() {
-        assertThat(api.service(), is(service));
     }
 
     @Test

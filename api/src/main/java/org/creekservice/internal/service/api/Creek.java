@@ -21,7 +21,6 @@ import static java.util.Objects.requireNonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.creekservice.api.base.annotation.VisibleForTesting;
-import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
 
@@ -30,15 +29,13 @@ public final class Creek implements CreekService {
 
     private final ComponentModel model;
     private final Options options;
-    private final ServiceDescriptor service;
 
-    public Creek(final ServiceDescriptor service) {
-        this(service, new Options(), new ComponentModel());
+    public Creek() {
+        this(new Options(), new ComponentModel());
     }
 
     @VisibleForTesting
-    Creek(final ServiceDescriptor service, final Options options, final ComponentModel model) {
-        this.service = requireNonNull(service, "service");
+    Creek(final Options options, final ComponentModel model) {
         this.options = requireNonNull(options, "options");
         this.model = requireNonNull(model, "model");
     }
@@ -55,14 +52,7 @@ public final class Creek implements CreekService {
         return model;
     }
 
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "intentional exposure")
-    @Override
-    public ServiceDescriptor service() {
-        return service;
-    }
-
-    public Creek initializing(final Optional<CreekExtensionProvider> provider) {
+    public void initializing(final Optional<CreekExtensionProvider> provider) {
         model.initializing(provider);
-        return this;
     }
 }

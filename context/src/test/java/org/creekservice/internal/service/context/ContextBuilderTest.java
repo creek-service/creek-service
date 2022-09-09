@@ -71,7 +71,6 @@ import org.mockito.quality.Strictness;
 class ContextBuilderTest {
 
     @Mock private Creek api;
-    @Mock private Creek initializingApi;
     @Mock private Options options;
     @Mock private ComponentModel model;
     @Mock private ComponentDescriptor component;
@@ -96,7 +95,6 @@ class ContextBuilderTest {
     void setUp() {
         when(api.options()).thenReturn(options);
         when(api.model()).thenReturn(model);
-        when(api.initializing(any())).thenReturn(initializingApi);
 
         when(model.hasType(any())).thenReturn(true);
 
@@ -104,10 +102,10 @@ class ContextBuilderTest {
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
         when(contextFactory.build(any(), any())).thenReturn(ctx);
 
-        when(extProvider0.initialize(any())).thenReturn(ext0);
+        when(extProvider0.initialize(any(), any())).thenReturn(ext0);
         when(ext0.name()).thenReturn("provider0");
 
-        when(extProvider1.initialize(any())).thenReturn(ext1);
+        when(extProvider1.initialize(any(), any())).thenReturn(ext1);
         when(ext1.name()).thenReturn("provider1");
 
         when(resourceInitializerFactory.build(any())).thenReturn(resourceInitializer);
@@ -177,17 +175,17 @@ class ContextBuilderTest {
     }
 
     @Test
-    void shouldPassApiToExtensionProviders() {
+    void shouldInitializeProviders() {
         // When:
         ctxBuilder.build();
 
         // Then:
-        verify(extProvider0).initialize(initializingApi);
-        verify(extProvider1).initialize(initializingApi);
+        verify(extProvider0).initialize(api, List.of(component));
+        verify(extProvider1).initialize(api, List.of(component));
     }
 
     @Test
-    void shouldPassInitializingExtensionProvidersToApi() {
+    void shouldTrackWhichProviderIsCurrentlyInitialising() {
         // When:
         ctxBuilder.build();
 
@@ -203,7 +201,7 @@ class ContextBuilderTest {
     void shouldClearInitializingExtensionOnException() {
         // Given:
         final RuntimeException expected = new RuntimeException("boom");
-        doThrow(expected).when(extProvider0).initialize(any());
+        doThrow(expected).when(extProvider0).initialize(any(), any());
 
         // When:
         final Exception e = assertThrows(RuntimeException.class, () -> ctxBuilder.build());
@@ -283,7 +281,7 @@ class ContextBuilderTest {
     @Test
     void shouldThrowHelpfulExceptionOnMultipleImplsOfSameExtension() {
         // Given:
-        when(extProvider1.initialize(any())).thenReturn(ext0);
+        when(extProvider1.initialize(any(), any())).thenReturn(ext0);
 
         // When:
         final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);

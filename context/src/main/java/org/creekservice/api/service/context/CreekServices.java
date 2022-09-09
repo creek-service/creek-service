@@ -46,7 +46,7 @@ public final class CreekServices {
      * @return the context builder.
      */
     public static Builder builder(final ServiceDescriptor service) {
-        return new ContextBuilder(service, new Creek(service), CreekExtensionProviders.load());
+        return new ContextBuilder(service, new Creek(), CreekExtensionProviders.load());
     }
 
     public interface Builder {

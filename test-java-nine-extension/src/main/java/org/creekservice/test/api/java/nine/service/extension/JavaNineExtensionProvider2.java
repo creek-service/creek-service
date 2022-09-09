@@ -20,10 +20,11 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.ComponentInternal;
 import org.creekservice.api.platform.metadata.ComponentOutput;
 import org.creekservice.api.platform.metadata.ResourceHandler;
-import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
@@ -31,12 +32,13 @@ import org.creekservice.api.service.extension.CreekService;
 public final class JavaNineExtensionProvider2 implements CreekExtensionProvider {
 
     @Override
-    public Extension initialize(final CreekService creek) {
-        creek.model()
+    public Extension initialize(
+            final CreekService api, final Collection<? extends ComponentDescriptor> components) {
+        api.model()
                 .addResource(Internal.class, new InternalHandler())
                 .addResource(Output.class, new OutputHandler());
 
-        return new Extension(creek.service());
+        return new Extension(components);
     }
 
     private static final class InternalHandler implements ResourceHandler<Internal> {
@@ -59,10 +61,10 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
 
         private static final String NAME = "java9_2";
 
-        private final ServiceDescriptor service;
+        private final Collection<? extends ComponentDescriptor> components;
 
-        public Extension(final ServiceDescriptor service) {
-            this.service = requireNonNull(service, "service");
+        public Extension(final Collection<? extends ComponentDescriptor> components) {
+            this.components = requireNonNull(components, "components");
         }
 
         @Override
@@ -70,8 +72,8 @@ public final class JavaNineExtensionProvider2 implements CreekExtensionProvider 
             return NAME;
         }
 
-        public ServiceDescriptor serviceDescriptor() {
-            return service;
+        public Collection<? extends ComponentDescriptor> components() {
+            return List.copyOf(components);
         }
     }
 

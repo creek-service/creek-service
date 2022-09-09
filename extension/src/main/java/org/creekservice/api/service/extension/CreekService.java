@@ -17,7 +17,6 @@
 package org.creekservice.api.service.extension;
 
 
-import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.model.ComponentModelContainer;
 import org.creekservice.api.service.extension.option.OptionCollection;
 
@@ -41,7 +40,4 @@ public interface CreekService {
      * @return the model.
      */
     ComponentModelContainer model();
-
-    /** @return the descriptor of the service being initialized. */
-    ServiceDescriptor service();
 }

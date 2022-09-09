@@ -93,7 +93,7 @@ class CreekServicesTest {
         // Then:
         final JavaNineExtensionProvider2.Extension ext =
                 ctx.extension(JavaNineExtensionProvider2.Extension.class);
-        assertThat(ext.serviceDescriptor(), is(serviceDescriptor));
+        assertThat(ext.components(), is(List.of(serviceDescriptor)));
     }
 
     @Test

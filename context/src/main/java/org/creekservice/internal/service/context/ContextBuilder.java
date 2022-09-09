@@ -184,7 +184,8 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     private CreekExtension initialize(final CreekExtensionProvider provider) {
         try {
-            return provider.initialize(api.initializing(Optional.of(provider)));
+            api.initializing(Optional.of(provider));
+            return provider.initialize(api, List.of(component));
         } finally {
             api.initializing(Optional.empty());
         }
