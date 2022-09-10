@@ -26,9 +26,10 @@ public final class CreekExtensionProviders {
     private CreekExtensionProviders() {}
 
     /** Instantiate any extensions available at runtime. */
-    public static List<CreekExtensionProvider> load() {
+    public static List<CreekExtensionProvider<?>> load() {
         return ServiceLoader.load(CreekExtensionProvider.class).stream()
                 .map(ServiceLoader.Provider::get)
+                .map(p -> (CreekExtensionProvider<?>) p)
                 .collect(Collectors.toUnmodifiableList());
     }
 }

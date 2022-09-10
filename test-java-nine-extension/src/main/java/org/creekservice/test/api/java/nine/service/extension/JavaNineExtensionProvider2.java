@@ -30,15 +30,17 @@ import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
 
-public final class JavaNineExtensionProvider2 implements CreekExtensionProvider {
+public final class JavaNineExtensionProvider2
+        implements CreekExtensionProvider<JavaNineExtensionProvider2.Extension> {
 
     @Override
     public Extension initialize(final CreekService api) {
-        api.model()
+        api.components()
+                .model()
                 .addResource(Internal.class, new InternalHandler())
                 .addResource(Output.class, new OutputHandler());
 
-        return new Extension(api.components().stream().collect(Collectors.toList()));
+        return new Extension(api.components().descriptors().stream().collect(Collectors.toList()));
     }
 
     private static final class InternalHandler implements ResourceHandler<Internal> {

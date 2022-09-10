@@ -30,7 +30,7 @@ package org.creekservice.api.service.extension;
  *   <li>both of the above
  * </ul>
  */
-public interface CreekExtensionProvider {
+public interface CreekExtensionProvider<T extends CreekExtension> {
 
     /**
      * Called to allow the instance to initialise.
@@ -50,5 +50,5 @@ public interface CreekExtensionProvider {
      * @param api the API Creek exposes to extensions.
      * @return the initialized extension.
      */
-    CreekExtension initialize(CreekService api);
+    T initialize(CreekService api);
 }

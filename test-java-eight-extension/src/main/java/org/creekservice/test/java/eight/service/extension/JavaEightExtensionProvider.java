@@ -21,14 +21,15 @@ import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
 
-public final class JavaEightExtensionProvider implements CreekExtensionProvider {
+public final class JavaEightExtensionProvider
+        implements CreekExtensionProvider<JavaEightExtensionProvider.Extension> {
 
     @Override
-    public CreekExtension initialize(final CreekService api) {
+    public Extension initialize(final CreekService api) {
         return new Extension();
     }
 
-    private static final class Extension implements CreekExtension {
+    public static final class Extension implements CreekExtension {
 
         private static final String NAME = "java8";
 

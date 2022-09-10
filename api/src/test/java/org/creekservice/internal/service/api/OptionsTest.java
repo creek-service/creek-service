@@ -17,15 +17,20 @@
 package org.creekservice.internal.service.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,9 +102,15 @@ class OptionsTest {
 
     @Test
     void shouldHaveThreadingTestForEachPublicMethod() {
-        final int publicMethodCount = publicMethodCount();
-        final int testedMethodCount = (int) publicMethods().count();
-        assertThat(testedMethodCount, is(publicMethodCount));
+        final List<String> publicMethodNames = publicMethodNames();
+        final List<String> tested = testedMethodNames();
+        assertThat(
+                "Public methods:\n"
+                        + String.join(System.lineSeparator(), publicMethodNames)
+                        + "\nTested methods:\n"
+                        + String.join(System.lineSeparator(), tested),
+                tested,
+                hasSize(publicMethodNames.size()));
     }
 
     public static Stream<Arguments> publicMethods() {
@@ -109,11 +120,18 @@ class OptionsTest {
                 Arguments.of("unused", (Consumer<Options>) Options::unused));
     }
 
-    private int publicMethodCount() {
-        return (int)
-                Arrays.stream(Options.class.getMethods())
-                        .filter(m -> !m.getDeclaringClass().equals(Object.class))
-                        .count();
+    private static List<String> testedMethodNames() {
+        return publicMethods()
+                .map(a -> (String) a.get()[0])
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private List<String> publicMethodNames() {
+        return Arrays.stream(Options.class.getMethods())
+                .filter(m -> !m.getDeclaringClass().equals(Object.class))
+                .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                .map(Method::toGenericString)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private static final class TestOptionsA implements CreekExtensionOptions {}

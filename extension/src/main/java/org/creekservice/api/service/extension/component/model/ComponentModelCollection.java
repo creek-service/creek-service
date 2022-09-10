@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.creekservice.api.service.extension.model;
+package org.creekservice.api.service.extension.component.model;
 
 
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
+import org.creekservice.api.platform.metadata.ResourceHandler;
 
 /** A collection of extensions to the Creek Service component model: */
 public interface ComponentModelCollection {
@@ -31,4 +32,20 @@ public interface ComponentModelCollection {
      * @return {@code true} if the collection knows about the type, {@code false} otherwise.
      */
     boolean hasType(Class<? extends ResourceDescriptor> type);
+
+    /**
+     * Retrieve a handler for a specific resource type.
+     *
+     * <p>If an exact match is found, it is returned. Otherwise, all handlers are searched for
+     * compatible handlers. The compatible set is reduced by removing any super types of other types
+     * with in the compatible set. The method will throw if the reduced set contains anything other
+     * than a single compatible handler.
+     *
+     * @param resourceType the type of the resource descriptor.
+     * @param <T> the type of the resource descriptor.
+     * @return the registered resource handler.
+     * @throws RuntimeException if no resource handler is registered, or if multiple registered
+     *     handlers exist.
+     */
+    <T extends ResourceDescriptor> ResourceHandler<T> resourceHandler(Class<T> resourceType);
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.api.model;
+package org.creekservice.internal.service.api.component.model;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
 import org.creekservice.api.base.annotation.VisibleForTesting;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
-import org.creekservice.api.service.extension.model.ComponentModelContainer;
+import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.component.model.ComponentModelContainer;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class ComponentModel implements ComponentModelContainer {
@@ -38,7 +39,7 @@ public final class ComponentModel implements ComponentModelContainer {
     private final Map<Class<? extends ResourceDescriptor>, ResourceExtension<?>>
             resourceExtensions = new HashMap<>();
 
-    private Optional<?> currentSource = Optional.empty();
+    private Optional<CreekExtensionProvider<?>> currentProvider = Optional.empty();
 
     public ComponentModel() {
         this(Thread.currentThread().getId());
@@ -60,16 +61,16 @@ public final class ComponentModel implements ComponentModelContainer {
                     "Handler already registered for type: "
                             + type.getName()
                             + ", registered by: "
-                            + existing.source
+                            + existing.provider
                             + "("
-                            + codeLocation(existing.source)
+                            + codeLocation(existing.provider)
                             + ")");
         }
 
         resourceExtensions.put(
                 type,
                 new ResourceExtension<>(
-                        handler, currentSource.orElseThrow(NotWithinInitializeException::new)));
+                        handler, currentProvider.orElseThrow(NotWithinInitializeException::new)));
         return this;
     }
 
@@ -80,6 +81,7 @@ public final class ComponentModel implements ComponentModelContainer {
         return resourceExtension(type).isPresent();
     }
 
+    @Override
     public <T extends ResourceDescriptor> ResourceHandler<T> resourceHandler(
             final Class<T> resourceType) {
         throwIfNotOnCorrectThread();
@@ -91,10 +93,10 @@ public final class ComponentModel implements ComponentModelContainer {
                                         resourceType, resourceExtensions.keySet()));
     }
 
-    public void initializing(final Optional<?> source) {
+    public void initializing(final Optional<CreekExtensionProvider<?>> provider) {
         throwIfNotOnCorrectThread();
 
-        currentSource = requireNonNull(source, "source");
+        currentProvider = requireNonNull(provider, "provider");
     }
 
     @SuppressWarnings("unchecked")
@@ -128,7 +130,7 @@ public final class ComponentModel implements ComponentModelContainer {
                                                 e ->
                                                         e.getKey().getSimpleName()
                                                                 + " ("
-                                                                + e.getValue().source
+                                                                + e.getValue().provider
                                                                 + ")")
                                         .sorted()
                                         .collect(Collectors.joining(", ", "[", "]")));
@@ -156,12 +158,14 @@ public final class ComponentModel implements ComponentModelContainer {
 
     private static final class ResourceExtension<T extends ResourceDescriptor> {
         final ResourceHandler<T> handler;
-        final Object source;
+        final CreekExtensionProvider<?> provider;
 
         @SuppressWarnings("unchecked")
-        private ResourceExtension(final ResourceHandler<? super T> handler, final Object source) {
+        private ResourceExtension(
+                final ResourceHandler<? super T> handler,
+                final CreekExtensionProvider<?> provider) {
             this.handler = (ResourceHandler<T>) requireNonNull(handler, "handler");
-            this.source = requireNonNull(source, "provider");
+            this.provider = requireNonNull(provider, "provider");
         }
     }
 

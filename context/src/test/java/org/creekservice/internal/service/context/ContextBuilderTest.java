@@ -26,6 +26,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -48,7 +49,7 @@ import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.api.Options;
-import org.creekservice.internal.service.api.model.ComponentModel;
+import org.creekservice.internal.service.api.component.model.ComponentModel;
 import org.creekservice.internal.service.context.ContextBuilder.ContextFactory;
 import org.creekservice.internal.service.context.ContextBuilder.UnhandledExceptionHandlerInstaller;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
@@ -57,6 +58,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
@@ -70,15 +72,17 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ContextBuilderTest {
 
-    @Mock private Creek api;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private Creek api;
+
     @Mock private Options options;
     @Mock private ComponentModel model;
     @Mock private ComponentDescriptor component;
     @Mock private ResourceA res0;
     @Mock private ResourceB res1;
     @Mock private CreekExtensionOptions customOptions;
-    @Mock private CreekExtensionProvider extProvider0;
-    @Mock private CreekExtensionProvider extProvider1;
+    @Mock private CreekExtensionProvider<TestExtensionA> extProvider0;
+    @Mock private CreekExtensionProvider<TestExtensionB> extProvider1;
     @Mock private TestExtensionA ext0;
     @Mock private TestExtensionB ext1;
     @Mock private ContextFactory contextFactory;
@@ -94,7 +98,7 @@ class ContextBuilderTest {
     @BeforeEach
     void setUp() {
         when(api.options()).thenReturn(options);
-        when(api.model()).thenReturn(model);
+        when(api.components().model()).thenReturn(model);
 
         when(model.hasType(any())).thenReturn(true);
 
@@ -281,7 +285,7 @@ class ContextBuilderTest {
     @Test
     void shouldThrowHelpfulExceptionOnMultipleImplsOfSameExtension() {
         // Given:
-        when(extProvider1.initialize(any())).thenReturn(ext0);
+        doReturn(ext0).when(extProvider1).initialize(any());
 
         // When:
         final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);

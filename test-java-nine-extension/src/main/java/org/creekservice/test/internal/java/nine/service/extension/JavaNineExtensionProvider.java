@@ -27,15 +27,15 @@ import org.creekservice.test.api.java.nine.service.extension.JavaNineExtension;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionInput;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionOptions;
 
-public final class JavaNineExtensionProvider implements CreekExtensionProvider {
+public final class JavaNineExtensionProvider implements CreekExtensionProvider<JavaNineExtension> {
 
     @Override
     public JavaNineExtension initialize(final CreekService api) {
-        api.model().addResource(JavaNineExtensionInput.class, new InputHandler());
+        api.components().model().addResource(JavaNineExtensionInput.class, new InputHandler());
         final Optional<JavaNineExtensionOptions> options =
                 api.options().get(JavaNineExtensionOptions.class);
         return new JavaNineExtension(
-                api.components().stream().collect(Collectors.toList()), options);
+                api.components().descriptors().stream().collect(Collectors.toList()), options);
     }
 
     private static final class InputHandler implements ResourceHandler<JavaNineExtensionInput> {
