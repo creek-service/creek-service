@@ -17,7 +17,12 @@
 package org.creekservice.api.service.extension;
 
 
-import org.creekservice.api.service.extension.model.ComponentModelContainer;
+import java.util.stream.Stream;
+import org.creekservice.api.platform.metadata.AggregateDescriptor;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.ServiceDescriptor;
+import org.creekservice.api.service.extension.component.ComponentDescriptorCollection;
+import org.creekservice.api.service.extension.component.model.ComponentModelContainer;
 import org.creekservice.api.service.extension.option.OptionCollection;
 
 /** The entry point to the API Creek exposes to service extensions. */
@@ -33,11 +38,60 @@ public interface CreekService {
     OptionCollection options();
 
     /**
-     * The model used to define aggregate and service descriptors.
+     * The descriptors of components.
      *
-     * <p>Extensions can extend this model.
+     * <p>If running within the context of a microservice, this will return a single {@link
+     * org.creekservice.api.platform.metadata.ServiceDescriptor}.
      *
-     * @return the model.
+     * <p>If running within the context of the system tests, this will contain all the components
+     * the system test is aware of.
+     *
+     * @return component descriptor collection.
      */
-    ComponentModelContainer model();
+    ComponentAccessor components();
+
+    interface ComponentAccessor {
+
+        /**
+         * The model used to define aggregate and service descriptors.
+         *
+         * <p>Extensions can extend this model.
+         *
+         * @return the model.
+         */
+        ComponentModelContainer model();
+
+        /**
+         * The definitions of the known components, i.e. services and aggregates.
+         *
+         * @return the accessor to the component definitions.
+         */
+        ComponentDescriptorAccessor descriptors();
+    }
+
+    interface ComponentDescriptorAccessor {
+
+        /**
+         * Aggregate component descriptors.
+         *
+         * <p>These are the aggregates discovered on the class or module path.
+         *
+         * @return a collection of aggregate definitions.
+         */
+        ComponentDescriptorCollection<AggregateDescriptor> aggregates();
+
+        /**
+         * Service component descriptors.
+         *
+         * <p>These are the services discovered on the class or module path.
+         *
+         * @return a collection of service definitions.
+         */
+        ComponentDescriptorCollection<ServiceDescriptor> services();
+
+        /** @return stream of all component descriptors. */
+        default Stream<ComponentDescriptor> stream() {
+            return Stream.concat(aggregates().stream(), services().stream());
+        }
+    }
 }

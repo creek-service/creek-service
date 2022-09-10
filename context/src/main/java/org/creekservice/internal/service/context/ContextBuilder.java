@@ -53,14 +53,14 @@ public final class ContextBuilder implements CreekServices.Builder {
     private final UnhandledExceptionHandlerInstaller unhandledExceptionHandlerInstaller;
     private final Runnable systemExit;
     private final Creek api;
-    private final List<CreekExtensionProvider> extensionProviders;
+    private final List<CreekExtensionProvider<?>> extensionProviders;
     private final ResourceInitializerFactory resourceInitializerFactory;
     private Optional<Clock> explicitClock = Optional.empty();
 
     public ContextBuilder(
             final ComponentDescriptor component,
             final Creek api,
-            final List<CreekExtensionProvider> extensionProviders) {
+            final List<CreekExtensionProvider<?>> extensionProviders) {
         this(
                 component,
                 api,
@@ -75,7 +75,7 @@ public final class ContextBuilder implements CreekServices.Builder {
     ContextBuilder(
             final ComponentDescriptor component,
             final Creek api,
-            final List<CreekExtensionProvider> extensionProviders,
+            final List<CreekExtensionProvider<?>> extensionProviders,
             final ResourceInitializerFactory resourceInitializerFactory,
             final ContextFactory contextFactory,
             final UnhandledExceptionHandlerInstaller unhandledExceptionHandlerInstaller,
@@ -135,7 +135,9 @@ public final class ContextBuilder implements CreekServices.Builder {
         final List<Object> unsupported =
                 component
                         .resources()
-                        .filter(resourceDef -> !api.model().hasType(resourceDef.getClass()))
+                        .filter(
+                                resourceDef ->
+                                        !api.components().model().hasType(resourceDef.getClass()))
                         .collect(Collectors.toList());
 
         if (!unsupported.isEmpty()) {
@@ -182,17 +184,17 @@ public final class ContextBuilder implements CreekServices.Builder {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private CreekExtension initialize(final CreekExtensionProvider provider) {
+    private CreekExtension initialize(final CreekExtensionProvider<?> provider) {
         try {
             api.initializing(Optional.of(provider));
-            return provider.initialize(api, List.of(component));
+            return provider.initialize(api);
         } finally {
             api.initializing(Optional.empty());
         }
     }
 
     private ResourceInitializer resourceInitializer() {
-        return resourceInitializerFactory.build(api.model()::resourceHandler);
+        return resourceInitializerFactory.build(api.components().model()::resourceHandler);
     }
 
     private static CreekExtension throwOnExtensionTypeClash(final List<CreekExtension> extensions) {

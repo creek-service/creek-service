@@ -17,6 +17,7 @@
 package org.creekservice.api.service.context;
 
 
+import java.util.List;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
@@ -46,7 +47,8 @@ public final class CreekServices {
      * @return the context builder.
      */
     public static Builder builder(final ServiceDescriptor service) {
-        return new ContextBuilder(service, new Creek(), CreekExtensionProviders.load());
+        return new ContextBuilder(
+                service, new Creek(List.of(service)), CreekExtensionProviders.load());
     }
 
     public interface Builder {

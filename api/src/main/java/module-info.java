@@ -7,4 +7,10 @@ module creek.service.api {
     exports org.creekservice.internal.service.api to
             creek.service.context,
             creek.system.test.executor;
+    exports org.creekservice.internal.service.api.component to
+            creek.service.context,
+            creek.system.test.executor;
+    exports org.creekservice.internal.service.api.component.model to
+            creek.service.context,
+            creek.system.test.executor;
 }

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.api;
+package org.creekservice.internal.service.api.component.model;
 
 import static java.lang.System.lineSeparator;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.hamcrest.Matchers.startsWith;
@@ -27,12 +28,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
 import static org.mockito.Mockito.mock;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
@@ -50,7 +55,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ComponentModelTest {
 
     private ComponentModel model;
-    @Mock private CreekExtensionProvider provider;
+    @Mock private CreekExtensionProvider<?> provider;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler1;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler2;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler3;
@@ -153,7 +158,7 @@ class ComponentModelTest {
                 e.getMessage(),
                 is(
                         "Unable to determine most specific resource handler for type: "
-                                + "org.creekservice.internal.service.api.ComponentModelTest$TestResource4. "
+                                + "org.creekservice.internal.service.api.component.model.ComponentModelTest$TestResource4. "
                                 + "Could be any handler for any type in [BaseResource (provider), BaseResource2 (provider)]"));
     }
 
@@ -173,7 +178,7 @@ class ComponentModelTest {
                 e.getMessage(),
                 startsWith(
                         "Handler already registered for type: "
-                                + "org.creekservice.internal.service.api.ComponentModelTest$BaseResource, "
+                                + "org.creekservice.internal.service.api.component.model.ComponentModelTest$BaseResource, "
                                 + "registered by: provider"));
     }
 
@@ -268,9 +273,15 @@ class ComponentModelTest {
 
     @Test
     void shouldHaveThreadingTestForEachPublicMethod() {
-        final int publicMethodCount = publicMethodCount();
-        final int testedMethodCount = (int) publicMethods().count();
-        assertThat(testedMethodCount, is(publicMethodCount));
+        final List<String> publicMethodNames = publicMethodNames();
+        final List<String> tested = testedMethodNames();
+        assertThat(
+                "Public methods:\n"
+                        + String.join(System.lineSeparator(), publicMethodNames)
+                        + "\nTested methods:\n"
+                        + String.join(System.lineSeparator(), tested),
+                tested,
+                hasSize(publicMethodNames.size()));
     }
 
     @SuppressWarnings("unchecked")
@@ -292,11 +303,18 @@ class ComponentModelTest {
                         (Consumer<ComponentModel>) m -> m.initializing(Optional.empty())));
     }
 
-    private int publicMethodCount() {
-        return (int)
-                Arrays.stream(ComponentModel.class.getMethods())
-                        .filter(m -> !m.getDeclaringClass().equals(Object.class))
-                        .count();
+    private static List<String> testedMethodNames() {
+        return publicMethods()
+                .map(a -> (String) a.get()[0])
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private List<String> publicMethodNames() {
+        return Arrays.stream(ComponentModel.class.getMethods())
+                .filter(m -> !m.getDeclaringClass().equals(Object.class))
+                .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                .map(Method::toGenericString)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private interface BaseResource extends ResourceDescriptor {}

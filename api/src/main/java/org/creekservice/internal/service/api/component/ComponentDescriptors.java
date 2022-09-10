@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package org.creekservice.api.service.extension;
+package org.creekservice.internal.service.api.component;
 
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.service.extension.component.ComponentDescriptorCollection;
 
-public final class CreekExtensionProviders {
+public final class ComponentDescriptors<T extends ComponentDescriptor>
+        implements ComponentDescriptorCollection<T> {
 
-    private CreekExtensionProviders() {}
+    private final List<T> components;
 
-    /** Instantiate any extensions available at runtime. */
-    public static List<CreekExtensionProvider<?>> load() {
-        return ServiceLoader.load(CreekExtensionProvider.class).stream()
-                .map(ServiceLoader.Provider::get)
-                .map(p -> (CreekExtensionProvider<?>) p)
-                .collect(Collectors.toUnmodifiableList());
+    public ComponentDescriptors(final Collection<? extends T> components) {
+        this.components = List.copyOf(components);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return components.iterator();
     }
 }

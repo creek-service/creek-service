@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package org.creekservice.api.service.extension.model;
+package org.creekservice.api.service.extension.component;
 
 
-import org.creekservice.api.platform.metadata.ResourceDescriptor;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import org.creekservice.api.platform.metadata.ComponentDescriptor;
 
-/** A collection of extensions to the Creek Service component model: */
-public interface ComponentModelCollection {
+/** Collection of component descriptors */
+public interface ComponentDescriptorCollection<T extends ComponentDescriptor> extends Iterable<T> {
 
-    /**
-     * The model collection knows about the supplied extension {@code type}.
-     *
-     * <p>Either the exact {@code type} has been added, or one of its super types.
-     *
-     * @param type the type to look up.
-     * @return {@code true} if the collection knows about the type, {@code false} otherwise.
-     */
-    boolean hasType(Class<? extends ResourceDescriptor> type);
+    /** @return stream of the defs the collection contains. */
+    default Stream<T> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
 }

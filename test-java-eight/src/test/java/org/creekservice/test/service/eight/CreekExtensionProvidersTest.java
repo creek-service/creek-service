@@ -30,7 +30,7 @@ class CreekExtensionProvidersTest {
     @Test
     void shouldLoadJava8Extension() {
         // When:
-        final CreekExtensionProvider ext = extByType("JavaEightExtensionProvider");
+        final CreekExtensionProvider<?> ext = extByType("JavaEightExtensionProvider");
 
         // Then:
         assertThat(ext, is(notNullValue()));
@@ -44,7 +44,7 @@ class CreekExtensionProvidersTest {
     @Test
     void shouldLoadJava9Extension() {
         // When:
-        final CreekExtensionProvider ext = extByType("JavaNineExtensionProvider");
+        final CreekExtensionProvider<?> ext = extByType("JavaNineExtensionProvider");
 
         // Then:
         assertThat(ext, is(notNullValue()));
@@ -55,7 +55,7 @@ class CreekExtensionProvidersTest {
         assertThat(ext.getClass().getModule().getName(), is(nullValue()));
     }
 
-    private CreekExtensionProvider extByType(final String className) {
+    private CreekExtensionProvider<?> extByType(final String className) {
         return CreekExtensionProviders.load().stream()
                 .filter(ext -> ext.getClass().getSimpleName().equals(className))
                 .findFirst()
