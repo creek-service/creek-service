@@ -45,16 +45,10 @@ public final class JavaNineExtensionProvider2
 
     private static final class InternalHandler implements ResourceHandler<Internal> {
         @Override
-        public void validate(final Collection<? extends Internal> resourceGroup) {}
-
-        @Override
         public void ensure(final Collection<? extends Internal> resources) {}
     }
 
     private static final class OutputHandler implements ResourceHandler<Output> {
-        @Override
-        public void validate(final Collection<? extends Output> resourceGroup) {}
-
         @Override
         public void ensure(final Collection<? extends Output> resources) {}
     }
