@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.component.model.ComponentModelContainer.HandlerTypeRef;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,9 +57,10 @@ class ComponentModelTest {
 
     private ComponentModel model;
     @Mock private CreekExtensionProvider<?> provider;
-    @Mock private ResourceHandler<? super ResourceDescriptor> handler1;
-    @Mock private ResourceHandler<? super ResourceDescriptor> handler2;
+    @Mock private ResourceHandler<ResourceDescriptor> handler1;
+    @Mock private ResourceHandler<ResourceDescriptor> handler2;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler3;
+    @Mock private ResourceHandler<GenericResource<?, ?>> genericHandler;
 
     @BeforeEach
     void setUp() {
@@ -88,6 +90,24 @@ class ComponentModelTest {
     void shouldAddResource() {
         // When:
         model.addResource(BaseResource.class, handler1);
+
+        // Then:
+        assertThat(model.hasType(BaseResource.class), is(true));
+    }
+
+    @Test
+    void shouldAddGenericResource() {
+        // When:
+        model.addResource(new HandlerTypeRef<>() {}, genericHandler);
+
+        // Then:
+        assertThat(model.hasType(GenericResource.class), is(true));
+    }
+
+    @Test
+    void shouldAddNonGenericResource() {
+        // When:
+        model.addResource(new HandlerTypeRef<BaseResource>() {}, handler1);
 
         // Then:
         assertThat(model.hasType(BaseResource.class), is(true));
@@ -261,6 +281,17 @@ class ComponentModelTest {
                                 Pattern.DOTALL)));
     }
 
+    @SuppressWarnings("rawtypes")
+    @Test
+    void shouldThrowOnRawHandlerTypeRef() {
+        // When:
+        final Exception e =
+                assertThrows(IllegalArgumentException.class, () -> new HandlerTypeRef() {});
+
+        // Then:
+        assertThat(e.getMessage(), is("HandlerTypeRef constructed as raw type"));
+    }
+
     @ParameterizedTest(name = "[" + INDEX_PLACEHOLDER + "] {0}")
     @MethodSource("publicMethods")
     void shouldThrowIfWrongThread(final String ignored, final Consumer<ComponentModel> method) {
@@ -293,6 +324,13 @@ class ComponentModelTest {
                                 m ->
                                         m.addResource(
                                                 TestResource.class, mock(ResourceHandler.class))),
+                Arguments.of(
+                        "addResource",
+                        (Consumer<ComponentModel>)
+                                m ->
+                                        m.addResource(
+                                                mock(HandlerTypeRef.class),
+                                                mock(ResourceHandler.class))),
                 Arguments.of(
                         "hasType", (Consumer<ComponentModel>) m -> m.hasType(TestResource.class)),
                 Arguments.of(
@@ -346,4 +384,7 @@ class ComponentModelTest {
             return null;
         }
     }
+
+    @SuppressWarnings("unused")
+    private interface GenericResource<K, V> extends ResourceDescriptor {}
 }
