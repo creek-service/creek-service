@@ -184,8 +184,8 @@ class ComponentModelTest {
                 e.getMessage(),
                 is(
                         "Unable to determine most specific resource handler for type: "
-                                + "org.creekservice.internal.service.api.component.model.ComponentModelTest$TestResource4. "
-                                + "Could be any handler for any type in [BaseResource (provider), BaseResource2 (provider)]"));
+                                + "org.creekservice.internal.service.api.component.model.ComponentModelTest$TestResource4"));
+        assertThat(e.getCause().getMessage(), startsWith("Ambiguous entry."));
     }
 
     @Test

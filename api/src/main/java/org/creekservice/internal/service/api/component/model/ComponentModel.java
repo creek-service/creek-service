@@ -21,8 +21,6 @@ import static java.util.Objects.requireNonNull;
 import static org.creekservice.api.base.type.CodeLocation.codeLocation;
 
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,13 +30,14 @@ import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.component.model.ComponentModelContainer;
 import org.creekservice.internal.service.api.extension.Extensions;
+import org.creekservice.internal.service.api.util.SubTypeAwareMap;
 
 public final class ComponentModel implements ComponentModelContainer {
 
     private final long threadId;
     private final Extensions extensions;
-    private final Map<Class<? extends ResourceDescriptor>, ResourceExtension<?>>
-            resourceExtensions = new HashMap<>();
+    private final SubTypeAwareMap<ResourceDescriptor, ResourceExtension<?>> resourceExtensions =
+            new SubTypeAwareMap<>();
 
     public ComponentModel(final Extensions extensions) {
         this(extensions, Thread.currentThread().getId());
@@ -99,52 +98,14 @@ public final class ComponentModel implements ComponentModelContainer {
     @SuppressWarnings("unchecked")
     private <T extends ResourceDescriptor> Optional<ResourceExtension<T>> resourceExtension(
             final Class<T> resourceType) {
-        final ResourceExtension<?> ext = resourceExtensions.get(resourceType);
-        if (ext != null) {
-            return Optional.of((ResourceExtension<T>) ext);
+        try {
+            return resourceExtensions.getOrSub(resourceType).map(e -> (ResourceExtension<T>) e);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException(
+                    "Unable to determine most specific resource handler for type: "
+                            + resourceType.getName(),
+                    e);
         }
-
-        final Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>> found =
-                resourceExtensions.entrySet().stream()
-                        .filter(e -> e.getKey().isAssignableFrom(resourceType))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        final Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>> reduced =
-                removeSuperTypes(found);
-
-        switch (reduced.size()) {
-            case 1:
-                return Optional.of((ResourceExtension<T>) reduced.values().iterator().next());
-            case 0:
-                return Optional.empty();
-            default:
-                throw new IllegalArgumentException(
-                        "Unable to determine most specific resource handler for type: "
-                                + resourceType.getName()
-                                + ". Could be any handler for any type in "
-                                + reduced.entrySet().stream()
-                                        .map(
-                                                e ->
-                                                        e.getKey().getSimpleName()
-                                                                + " ("
-                                                                + e.getValue().provider
-                                                                + ")")
-                                        .sorted()
-                                        .collect(Collectors.joining(", ", "[", "]")));
-        }
-    }
-
-    private Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>>
-            removeSuperTypes(
-                    final Map<Class<? extends ResourceDescriptor>, ? extends ResourceExtension<?>>
-                            types) {
-        return types.entrySet().stream()
-                .filter(
-                        e ->
-                                types.keySet().stream()
-                                        .filter(t -> !t.equals(e.getKey()))
-                                        .noneMatch(t -> e.getKey().isAssignableFrom(t)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private void throwIfNotOnCorrectThread() {

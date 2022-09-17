@@ -18,22 +18,21 @@ package org.creekservice.internal.service.api.options;
 
 
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.creekservice.api.base.annotation.VisibleForTesting;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.option.OptionContainer;
+import org.creekservice.internal.service.api.util.SubTypeAwareMap;
 
 public final class Options implements OptionContainer {
 
     private final long threadId;
     private final Set<Class<? extends CreekExtensionOptions>> unused = new HashSet<>();
-    private final Map<Class<? extends CreekExtensionOptions>, CreekExtensionOptions> options =
-            new HashMap<>();
+    private final SubTypeAwareMap<CreekExtensionOptions, CreekExtensionOptions> options =
+            new SubTypeAwareMap<>();
 
     public Options() {
         this(Thread.currentThread().getId());
@@ -66,7 +65,12 @@ public final class Options implements OptionContainer {
     public <T extends CreekExtensionOptions> Optional<T> get(final Class<T> type) {
         throwIfNotOnCorrectThread();
         unused.remove(type);
-        return Optional.ofNullable(options.get(type)).map(type::cast);
+        try {
+            return options.getOrSuper(type).map(type::cast);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException(
+                    "Requested option type is ambiguous: " + type.getName(), e);
+        }
     }
 
     public Set<CreekExtensionOptions> unused() {

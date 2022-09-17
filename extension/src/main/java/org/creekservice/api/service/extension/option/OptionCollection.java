@@ -25,9 +25,13 @@ public interface OptionCollection {
     /**
      * Retrieve an option by type.
      *
+     * <p>The supplied {@code type} can also be a super type or a registered option.
+     *
      * @param type the type of option to retrieve.
      * @param <T> the type of the option to retrieve.
      * @return the option, if present, otherwise {@code empty}.
+     * @throws RuntimeException if it is ambiguous which option should be returned, i.e. if multiple
+     *     as subtypes of {@code type}.
      */
     <T extends CreekExtensionOptions> Optional<T> get(Class<T> type);
 }
