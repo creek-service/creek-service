@@ -18,21 +18,19 @@ package org.creekservice.internal.service.context;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
+import org.creekservice.api.service.extension.extension.ExtensionsCollection;
 
 final class Context implements CreekContext {
 
     private final Clock clock;
-    private final List<CreekExtension> extensions;
+    private final ExtensionsCollection extensions;
 
-    Context(final Clock clock, final Collection<CreekExtension> extensions) {
+    Context(final Clock clock, final ExtensionsCollection extensions) {
         this.clock = requireNonNull(clock, "clock");
-        this.extensions = List.copyOf(requireNonNull(extensions, "extensions"));
+        this.extensions = requireNonNull(extensions, "extensions");
     }
 
     @Override
@@ -40,27 +38,8 @@ final class Context implements CreekContext {
         return clock;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends CreekExtension> T extension(final Class<T> extensionType) {
-        return (T)
-                extensions.stream()
-                        .filter(ext -> extensionType.isAssignableFrom(ext.getClass()))
-                        .findFirst()
-                        .orElseThrow(
-                                () -> new UnknownExtensionException(extensionType, extensions));
-    }
-
-    private static class UnknownExtensionException extends IllegalArgumentException {
-        UnknownExtensionException(
-                final Class<?> extensionType, final Collection<CreekExtension> extensions) {
-            super(
-                    "No extension of requested type is registered: "
-                            + extensionType
-                            + ", installed_extensions: "
-                            + extensions.stream()
-                                    .map(CreekExtension::name)
-                                    .collect(Collectors.toList()));
-        }
+        return extensions.get(extensionType);
     }
 }

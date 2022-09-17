@@ -26,7 +26,9 @@ import static org.hamcrest.Matchers.matchesRegex;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
+import static org.mockito.Mock.Strictness.LENIENT;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -43,6 +45,7 @@ import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.component.model.ComponentModelContainer.HandlerTypeRef;
+import org.creekservice.internal.service.api.extension.Extensions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,23 +58,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ComponentModelTest {
 
-    private ComponentModel model;
+    @Mock(strictness = LENIENT)
+    private Extensions extensions;
+
     @Mock private CreekExtensionProvider<?> provider;
     @Mock private ResourceHandler<ResourceDescriptor> handler1;
     @Mock private ResourceHandler<ResourceDescriptor> handler2;
     @Mock private ResourceHandler<? super ResourceDescriptor> handler3;
     @Mock private ResourceHandler<GenericResource<?, ?>> genericHandler;
+    private ComponentModel model;
 
     @BeforeEach
     void setUp() {
-        model = new ComponentModel();
-        model.initializing(Optional.of(provider));
+        model = new ComponentModel(extensions);
+        when(extensions.currentlyInitialising()).thenReturn(Optional.of(provider));
     }
 
     @Test
     void shouldThrowIfAddingResourceOutsideOfInitializeCall() {
         // Given:
-        model.initializing(Optional.empty());
+        when(extensions.currentlyInitialising()).thenReturn(Optional.empty());
 
         // When:
         final Exception e =
@@ -296,7 +302,7 @@ class ComponentModelTest {
     @MethodSource("publicMethods")
     void shouldThrowIfWrongThread(final String ignored, final Consumer<ComponentModel> method) {
         // Given:
-        model = new ComponentModel(Thread.currentThread().getId() + 1);
+        model = new ComponentModel(extensions, Thread.currentThread().getId() + 1);
 
         // Then:
         assertThrows(ConcurrentModificationException.class, () -> method.accept(model));
@@ -335,10 +341,7 @@ class ComponentModelTest {
                         "hasType", (Consumer<ComponentModel>) m -> m.hasType(TestResource.class)),
                 Arguments.of(
                         "resourceHandler",
-                        (Consumer<ComponentModel>) m -> m.resourceHandler(TestResource.class)),
-                Arguments.of(
-                        "initializing",
-                        (Consumer<ComponentModel>) m -> m.initializing(Optional.empty())));
+                        (Consumer<ComponentModel>) m -> m.resourceHandler(TestResource.class)));
     }
 
     private static List<String> testedMethodNames() {

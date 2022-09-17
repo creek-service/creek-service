@@ -23,6 +23,7 @@ import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;
 import org.creekservice.api.service.extension.component.ComponentDescriptorCollection;
 import org.creekservice.api.service.extension.component.model.ComponentModelContainer;
+import org.creekservice.api.service.extension.extension.ExtensionContainer;
 import org.creekservice.api.service.extension.option.OptionCollection;
 
 /** The entry point to the API Creek exposes to service extensions. */
@@ -49,6 +50,13 @@ public interface CreekService {
      * @return component descriptor collection.
      */
     ComponentAccessor components();
+
+    /**
+     * Operations and information about the installed extensions.
+     *
+     * @return container for Creek service extensions, a.k.a. plugins.
+     */
+    ExtensionContainer extensions();
 
     interface ComponentAccessor {
 
