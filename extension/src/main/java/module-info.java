@@ -8,6 +8,7 @@ module creek.service.extension {
     exports org.creekservice.api.service.extension.component;
     exports org.creekservice.api.service.extension.component.model;
     exports org.creekservice.api.service.extension.option;
+    exports org.creekservice.api.service.extension.extension;
 
     uses CreekExtensionProvider;
 }

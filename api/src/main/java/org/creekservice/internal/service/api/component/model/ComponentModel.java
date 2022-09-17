@@ -31,23 +31,23 @@ import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.component.model.ComponentModelContainer;
+import org.creekservice.internal.service.api.extension.Extensions;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class ComponentModel implements ComponentModelContainer {
 
     private final long threadId;
+    private final Extensions extensions;
     private final Map<Class<? extends ResourceDescriptor>, ResourceExtension<?>>
             resourceExtensions = new HashMap<>();
 
-    private Optional<CreekExtensionProvider<?>> currentProvider = Optional.empty();
-
-    public ComponentModel() {
-        this(Thread.currentThread().getId());
+    public ComponentModel(final Extensions extensions) {
+        this(extensions, Thread.currentThread().getId());
     }
 
     @VisibleForTesting
-    ComponentModel(final long threadId) {
+    ComponentModel(final Extensions extensions, final long threadId) {
         this.threadId = threadId;
+        this.extensions = requireNonNull(extensions, "extensions");
     }
 
     @Override
@@ -70,7 +70,10 @@ public final class ComponentModel implements ComponentModelContainer {
         resourceExtensions.put(
                 type,
                 new ResourceExtension<>(
-                        handler, currentProvider.orElseThrow(NotWithinInitializeException::new)));
+                        handler,
+                        extensions
+                                .currentlyInitialising()
+                                .orElseThrow(NotWithinInitializeException::new)));
         return this;
     }
 
@@ -91,12 +94,6 @@ public final class ComponentModel implements ComponentModelContainer {
                         () ->
                                 new UnsupportedResourceTypesException(
                                         resourceType, resourceExtensions.keySet()));
-    }
-
-    public void initializing(final Optional<CreekExtensionProvider<?>> provider) {
-        throwIfNotOnCorrectThread();
-
-        currentProvider = requireNonNull(provider, "provider");
     }
 
     @SuppressWarnings("unchecked")

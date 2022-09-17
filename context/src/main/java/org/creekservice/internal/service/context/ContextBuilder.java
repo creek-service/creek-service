@@ -17,12 +17,8 @@
 package org.creekservice.internal.service.context;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.collectingAndThen;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.security.ProtectionDomain;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,7 +35,9 @@ import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.extension.ExtensionsCollection;
 import org.creekservice.internal.service.api.Creek;
+import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -109,10 +107,10 @@ public final class ContextBuilder implements CreekServices.Builder {
     public CreekContext build() {
         installDefaultUncaughtExceptionHandler();
 
-        final Collection<CreekExtension> extensions = createExtensions();
-        final CreekContext ctx = contextFactory.build(createClock(), extensions);
-        throwOnUnsupportedResourceType(extensions);
-        throwOnUnusedOptionType(extensions);
+        initializeExtensions();
+        final CreekContext ctx = contextFactory.build(createClock(), api.extensions());
+        throwOnUnsupportedResourceType();
+        throwOnUnusedOptionType();
 
         resourceInitializer().service(List.of(component));
 
@@ -131,7 +129,7 @@ public final class ContextBuilder implements CreekServices.Builder {
                 });
     }
 
-    private void throwOnUnsupportedResourceType(final Collection<CreekExtension> extensions) {
+    private void throwOnUnsupportedResourceType() {
         final List<Object> unsupported =
                 component
                         .resources()
@@ -142,11 +140,11 @@ public final class ContextBuilder implements CreekServices.Builder {
 
         if (!unsupported.isEmpty()) {
             throw new UnsupportedResourceTypesException(
-                    component, installedExtensions(extensions), unsupported);
+                    component, installedExtensions(), unsupported);
         }
     }
 
-    private void throwOnUnusedOptionType(final Collection<CreekExtension> extensions) {
+    private void throwOnUnusedOptionType() {
         final Set<CreekExtensionOptions> unused = api.options().unused();
         if (unused.isEmpty()) {
             return;
@@ -159,7 +157,7 @@ public final class ContextBuilder implements CreekServices.Builder {
                 "No registered Creek extensions were interested in the following options: "
                         + unusedText
                         + ", "
-                        + installedExtensions(extensions));
+                        + installedExtensions());
     }
 
     private Clock createClock() {
@@ -167,71 +165,19 @@ public final class ContextBuilder implements CreekServices.Builder {
                 .load(() -> explicitClock.orElseGet(AccurateClock::create));
     }
 
-    private Collection<CreekExtension> createExtensions() {
-        return extensionProviders.stream()
-                .map(this::initialize)
-                .collect(
-                        Collectors.groupingBy(
-                                CreekExtension::getClass,
-                                collectingAndThen(
-                                        Collectors.toList(),
-                                        ContextBuilder::throwOnExtensionTypeClash)))
-                .values()
-                .stream()
-                .sorted(
-                        Comparator.comparing(
-                                CreekExtension::getClass, Comparator.comparing(Class::getName)))
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    private CreekExtension initialize(final CreekExtensionProvider<?> provider) {
-        try {
-            api.initializing(Optional.of(provider));
-            return provider.initialize(api);
-        } finally {
-            api.initializing(Optional.empty());
-        }
+    private void initializeExtensions() {
+        final Extensions extensions = api.extensions();
+        extensionProviders.forEach(extensions::ensureExtension);
     }
 
     private ResourceInitializer resourceInitializer() {
         return resourceInitializerFactory.build(api.components().model()::resourceHandler);
     }
 
-    private static CreekExtension throwOnExtensionTypeClash(final List<CreekExtension> extensions) {
-        if (extensions.size() == 1) {
-            return extensions.get(0);
-        }
-
-        throw new ExtensionTypeClashException(extensions);
-    }
-
-    private static String installedExtensions(final Collection<CreekExtension> extensions) {
-        return extensions.stream()
+    private String installedExtensions() {
+        return api.extensions().stream()
                 .map(CreekExtension::name)
                 .collect(Collectors.joining(", ", "installed_extensions: ", ""));
-    }
-
-    private static class ExtensionTypeClashException extends IllegalArgumentException {
-        ExtensionTypeClashException(final Collection<? extends CreekExtension> extensions) {
-            super(
-                    "Multiple extensions found with the same type. This is not supported. type: "
-                            + type(extensions)
-                            + ", locations: "
-                            + locations(extensions));
-        }
-
-        private static String type(final Collection<? extends CreekExtension> extensions) {
-            return extensions.iterator().next().getClass().getName();
-        }
-
-        private static String locations(final Collection<? extends CreekExtension> extensions) {
-            return extensions.stream()
-                    .map(Object::getClass)
-                    .map(Class::getProtectionDomain)
-                    .map(ProtectionDomain::getCodeSource)
-                    .map(src -> src == null ? "unknown" : src.getLocation().toString())
-                    .collect(Collectors.joining(", ", "[", "]"));
-        }
     }
 
     @VisibleForTesting
@@ -255,7 +201,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ContextFactory {
-        CreekContext build(Clock clock, Collection<CreekExtension> extensions);
+        CreekContext build(Clock clock, ExtensionsCollection extensions);
     }
 
     @VisibleForTesting

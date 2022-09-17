@@ -21,12 +21,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,7 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.creekservice.api.base.type.temporal.AccurateClock;
@@ -48,8 +45,9 @@ import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.internal.service.api.Creek;
-import org.creekservice.internal.service.api.Options;
 import org.creekservice.internal.service.api.component.model.ComponentModel;
+import org.creekservice.internal.service.api.extension.Extensions;
+import org.creekservice.internal.service.api.options.Options;
 import org.creekservice.internal.service.context.ContextBuilder.ContextFactory;
 import org.creekservice.internal.service.context.ContextBuilder.UnhandledExceptionHandlerInstaller;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
@@ -61,9 +59,7 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -99,6 +95,7 @@ class ContextBuilderTest {
     void setUp() {
         when(api.options()).thenReturn(options);
         when(api.components().model()).thenReturn(model);
+        when(api.extensions().stream()).thenReturn(Stream.of(ext0, ext1));
 
         when(model.hasType(any())).thenReturn(true);
 
@@ -184,46 +181,18 @@ class ContextBuilderTest {
         ctxBuilder.build();
 
         // Then:
-        verify(extProvider0).initialize(api);
-        verify(extProvider1).initialize(api);
+        verify(api.extensions()).ensureExtension(extProvider0);
+        verify(api.extensions()).ensureExtension(extProvider1);
     }
 
     @Test
-    void shouldTrackWhichProviderIsCurrentlyInitialising() {
-        // When:
-        ctxBuilder.build();
-
-        // Then:
-        final InOrder inOrder = Mockito.inOrder(api);
-        inOrder.verify(api).initializing(Optional.of(extProvider0));
-        inOrder.verify(api).initializing(Optional.empty());
-        inOrder.verify(api).initializing(Optional.of(extProvider1));
-        inOrder.verify(api).initializing(Optional.empty());
-    }
-
-    @Test
-    void shouldClearInitializingExtensionOnException() {
-        // Given:
-        final RuntimeException expected = new RuntimeException("boom");
-        doThrow(expected).when(extProvider0).initialize(any());
-
-        // When:
-        final Exception e = assertThrows(RuntimeException.class, () -> ctxBuilder.build());
-
-        // Then:
-        final InOrder inOrder = Mockito.inOrder(api);
-        inOrder.verify(api).initializing(Optional.of(extProvider0));
-        inOrder.verify(api).initializing(Optional.empty());
-        assertThat(e, is(expected));
-    }
-
-    @Test
-    void shouldBuildContextWithSortedExtensions() {
+    void shouldBuildContextWithExtensions() {
         // Given:
         final CreekContext result = ctxBuilder.build();
 
         // Then:
-        verify(contextFactory).build(any(), eq(List.of(ext0, ext1)));
+        final Extensions extensions = api.extensions();
+        verify(contextFactory).build(any(), eq(extensions));
         assertThat(result, is(ctx));
     }
 
@@ -280,27 +249,6 @@ class ContextBuilderTest {
 
         // Then:
         verify(contextFactory).build(isA(TestClock.class), any());
-    }
-
-    @Test
-    void shouldThrowHelpfulExceptionOnMultipleImplsOfSameExtension() {
-        // Given:
-        doReturn(ext0).when(extProvider1).initialize(any());
-
-        // When:
-        final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);
-
-        // Then:
-        assertThat(
-                e.getMessage(),
-                startsWith(
-                        "Multiple extensions found with the same type. This is not supported. "));
-        assertThat(e.getMessage(), containsString("type: " + ext0.getClass().getName()));
-        assertThat(
-                e.getMessage(),
-                containsString(
-                        "locations: ["
-                                + getClass().getProtectionDomain().getCodeSource().getLocation()));
     }
 
     @Test

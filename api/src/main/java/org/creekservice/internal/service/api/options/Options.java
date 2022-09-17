@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.creekservice.internal.service.api;
+package org.creekservice.internal.service.api.options;
 
 
 import java.util.ConcurrentModificationException;
