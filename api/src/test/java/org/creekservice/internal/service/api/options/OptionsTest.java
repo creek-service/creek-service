@@ -19,6 +19,7 @@ package org.creekservice.internal.service.api.options;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
 
@@ -90,6 +91,46 @@ class OptionsTest {
         assertThat(result, is(Set.of(userOptionsB)));
     }
 
+    @Test
+    void shouldGetByExactType() {
+        // Given:
+        options.add(userOptionsA);
+        options.add(userOptionsB);
+
+        // Then:
+        assertThat(options.get(TestOptionsA.class), is(Optional.of(userOptionsA)));
+        assertThat(options.get(TestOptionsB.class), is(Optional.of(userOptionsB)));
+    }
+
+    @Test
+    void shouldGetBySubType() {
+        // Given:
+        options.add(userOptionsA);
+
+        // Then:
+        assertThat(options.get(BaseOptions.class), is(Optional.of(userOptionsA)));
+    }
+
+    @Test
+    void shouldThrowOnAmbiguousGet() {
+        // Given:
+        options.add(userOptionsA);
+        options.add(userOptionsB);
+
+        // When:
+        final Exception e =
+                assertThrows(RuntimeException.class, () -> options.get(BaseOptions.class));
+
+        // Return:
+        assertThat(
+                e.getMessage(),
+                is(
+                        "Requested option type is ambiguous: "
+                                + "org.creekservice.internal.service.api.options.OptionsTest$BaseOptions"));
+
+        assertThat(e.getCause().getMessage(), startsWith("Ambiguous entry"));
+    }
+
     @ParameterizedTest(name = "[" + INDEX_PLACEHOLDER + "] {0}")
     @MethodSource("publicMethods")
     void shouldThrowIfWrongThread(final String ignored, final Consumer<Options> method) {
@@ -134,7 +175,9 @@ class OptionsTest {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private static final class TestOptionsA implements CreekExtensionOptions {}
+    private interface BaseOptions extends CreekExtensionOptions {}
 
-    private static final class TestOptionsB implements CreekExtensionOptions {}
+    private static final class TestOptionsA implements BaseOptions {}
+
+    private static final class TestOptionsB implements BaseOptions {}
 }
