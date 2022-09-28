@@ -16,5 +16,6 @@ module creek.service.api {
             creek.service.context,
             creek.system.test.executor;
     exports org.creekservice.internal.service.api.options to
-            creek.service.context;
+            creek.service.context,
+            creek.system.test.executor;
 }
