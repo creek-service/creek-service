@@ -64,7 +64,7 @@ subprojects {
         set("creekObsVersion", "0.2.0-SNAPSHOT")
         set("spotBugsVersion", "4.7.2")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 
-        set("log4jVersion", "2.18.0")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+        set("log4jVersion", "2.19.0")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
         set("guavaVersion", "31.1-jre")         // https://mvnrepository.com/artifact/com.google.guava/guava
         set("junitVersion", "5.9.1")            // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
         set("junitPioneerVersion", "1.7.1")     // https://mvnrepository.com/artifact/org.junit-pioneer/junit-pioneer
@@ -91,7 +91,7 @@ subprojects {
         testImplementation("org.hamcrest:hamcrest-core:$hamcrestVersion")
         testImplementation("com.google.guava:guava-testlib:$guavaVersion")
         testImplementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
-        testImplementation("org.apache.logging.log4j:log4j-slf4j18-impl:$log4jVersion")
+        testImplementation("org.apache.logging.log4j:log4j-slf4j2-impl:$log4jVersion")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     }
 
