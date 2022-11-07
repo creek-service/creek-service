@@ -2,8 +2,8 @@ plugins {
     `java-library`
 }
 
-val creekPlatformVersion : String by extra
+val creekVersion : String by extra
 
 dependencies {
-    api("org.creekservice:creek-platform-metadata:$creekPlatformVersion")
+    api("org.creekservice:creek-platform-metadata:$creekVersion")
 }

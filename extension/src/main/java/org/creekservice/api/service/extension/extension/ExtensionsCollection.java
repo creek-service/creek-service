@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.creekservice.api.service.extension.CreekExtension;
 
+/** Read only collection of extensions to Creek service. */
 public interface ExtensionsCollection extends Iterable<CreekExtension> {
 
     /**

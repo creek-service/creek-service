@@ -24,8 +24,15 @@ import org.creekservice.api.base.type.temporal.Clock;
 /** Loads the impl of the clock to load from an environment variable. */
 public final class SystemEnvClockLoader {
 
+    /** Environment variable name to set to configure the {@link Clock} implementation to use. */
     public static final String ENV_VAR_NAME = "CREEK_CLOCK";
 
+    /**
+     * Load the clock impl from the environment variable, or use {@code defaultClock} if not set.
+     *
+     * @param defaultClock the default to use if the variable is not set
+     * @return the clock
+     */
     public Clock load(final Supplier<Clock> defaultClock) {
         return SystemEnv.readInstance(ENV_VAR_NAME, defaultClock);
     }

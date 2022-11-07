@@ -34,6 +34,7 @@ import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.extension.ExtensionContainer;
 import org.creekservice.internal.service.api.Creek;
 
+/** Implementation of {@link ExtensionContainer} */
 public final class Extensions implements ExtensionContainer {
 
     private final long threadId;
@@ -47,6 +48,7 @@ public final class Extensions implements ExtensionContainer {
     private final Map<Class<? extends CreekExtension>, ExtensionData<?>> extensions =
             new LinkedHashMap<>();
 
+    /** @param api the creek api */
     public Extensions(final Creek api) {
         this(api, Thread.currentThread().getId());
     }
@@ -57,6 +59,7 @@ public final class Extensions implements ExtensionContainer {
         this.api = requireNonNull(api, "api");
     }
 
+    /** @return non-empty if an extension is currently being initialized. */
     public Optional<CreekExtensionProvider<?>> currentlyInitialising() {
         throwIfNotOnCorrectThread();
         return initStack.isEmpty() ? Optional.empty() : Optional.of(initStack.peek());
@@ -68,6 +71,13 @@ public final class Extensions implements ExtensionContainer {
         return ensureExtension(createInstance(providerType));
     }
 
+    /**
+     * Ensure the extension {@code provider} has been applied, applying if necessary.
+     *
+     * @param provider the extension provider
+     * @param <T> the type of the extension
+     * @return the initialised extension
+     */
     @SuppressWarnings("unchecked")
     public <T extends CreekExtension> T ensureExtension(final CreekExtensionProvider<T> provider) {
         throwIfNotOnCorrectThread();

@@ -21,11 +21,16 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+/** Util class for working with {@link CreekExtensionProvider}. */
 public final class CreekExtensionProviders {
 
     private CreekExtensionProviders() {}
 
-    /** Instantiate any extensions available at runtime. */
+    /**
+     * Instantiate any extensions available at runtime.
+     *
+     * @return all extension providers found on class and module path
+     */
     public static List<CreekExtensionProvider<?>> load() {
         return ServiceLoader.load(CreekExtensionProvider.class).stream()
                 .map(ServiceLoader.Provider::get)

@@ -19,6 +19,7 @@ package org.creekservice.api.service.extension.option;
 
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 
+/** Mutable container of {@link CreekExtensionOptions options}. */
 public interface OptionContainer extends OptionCollection {
 
     /**

@@ -34,12 +34,14 @@ import org.creekservice.internal.service.api.component.model.ComponentModel;
 import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.api.options.Options;
 
+/** Implementation of {@link CreekService} */
 public final class Creek implements CreekService {
 
     private final Options options;
     private final Components components;
     private final Extensions extensions;
 
+    /** @param components all known component descriptors */
     public Creek(final Collection<? extends ComponentDescriptor> components) {
         this(components, new Options(), Extensions::new, ComponentModel::new);
     }
@@ -72,6 +74,7 @@ public final class Creek implements CreekService {
         return extensions;
     }
 
+    /** Implementation of {@link ComponentAccessor} */
     public static final class Components implements ComponentAccessor {
 
         private final ComponentModel model;
@@ -97,6 +100,7 @@ public final class Creek implements CreekService {
         }
     }
 
+    /** Implementation of {@link ComponentDescriptorAccessor} */
     public static final class Descriptors implements ComponentDescriptorAccessor {
 
         private final ComponentDescriptors<AggregateDescriptor> aggregates;

@@ -1,6 +1,7 @@
 
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 
+/** Defines types used by Creek Service extensions */
 module creek.service.extension {
     requires transitive creek.platform.metadata;
 

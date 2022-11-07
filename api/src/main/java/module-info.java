@@ -1,3 +1,4 @@
+/** API implementation of Creek Service. */
 module creek.service.api {
     requires transitive creek.service.extension;
     requires creek.base.annotation;

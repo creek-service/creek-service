@@ -51,6 +51,7 @@ public final class CreekServices {
                 service, new Creek(List.of(service)), CreekExtensionProviders.load());
     }
 
+    /** Builder of {@link CreekContext} */
     public interface Builder {
 
         /**

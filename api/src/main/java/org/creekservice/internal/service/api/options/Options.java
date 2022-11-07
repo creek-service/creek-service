@@ -27,6 +27,7 @@ import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.option.OptionContainer;
 import org.creekservice.internal.service.api.util.SubTypeAwareMap;
 
+/** Implementation of {@link OptionContainer} */
 public final class Options implements OptionContainer {
 
     private final long threadId;
@@ -34,6 +35,7 @@ public final class Options implements OptionContainer {
     private final SubTypeAwareMap<CreekExtensionOptions, CreekExtensionOptions> options =
             new SubTypeAwareMap<>();
 
+    /** Constructor */
     public Options() {
         this(Thread.currentThread().getId());
     }
@@ -73,6 +75,10 @@ public final class Options implements OptionContainer {
         }
     }
 
+    /**
+     * @return extension options supplied by the user, but not used by any extension, i.e.
+     *     superfluous options.
+     */
     public Set<CreekExtensionOptions> unused() {
         throwIfNotOnCorrectThread();
         return unused.stream().map(options::get).collect(Collectors.toUnmodifiableSet());

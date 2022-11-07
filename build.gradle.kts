@@ -45,6 +45,10 @@ allprojects {
 subprojects {
     apply(plugin = "maven-publish")
 
+    if (name.startsWith("test-")) {
+        tasks.javadoc { onlyIf { false } }
+    }
+
     if (name != "test-java-eight-extension"
         && name != "test-java-nine-extension"
     ) {
@@ -58,10 +62,7 @@ subprojects {
     }
 
     extra.apply {
-        set("creekBaseVersion", "0.2.0-SNAPSHOT")
-        set("creekTestVersion", "0.2.0-SNAPSHOT")
-        set("creekPlatformVersion", "0.2.0-SNAPSHOT")
-        set("creekObsVersion", "0.2.0-SNAPSHOT")
+        set("creekVersion", "0.2.0-SNAPSHOT")
         set("spotBugsVersion", "4.7.3")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 
         set("log4jVersion", "2.19.0")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
@@ -72,7 +73,7 @@ subprojects {
         set("hamcrestVersion", "2.2")           // https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core
     }
 
-    val creekTestVersion : String by extra
+    val creekVersion : String by extra
     val guavaVersion : String by extra
     val log4jVersion : String by extra
     val junitVersion: String by extra
@@ -81,9 +82,9 @@ subprojects {
     val hamcrestVersion : String by extra
 
     dependencies {
-        testImplementation("org.creekservice:creek-test-hamcrest:$creekTestVersion")
-        testImplementation("org.creekservice:creek-test-util:$creekTestVersion")
-        testImplementation("org.creekservice:creek-test-conformity:$creekTestVersion")
+        testImplementation("org.creekservice:creek-test-hamcrest:$creekVersion")
+        testImplementation("org.creekservice:creek-test-util:$creekVersion")
+        testImplementation("org.creekservice:creek-test-conformity:$creekVersion")
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
         testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
         testImplementation("org.junit-pioneer:junit-pioneer:$junitPioneerVersion")

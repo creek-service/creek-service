@@ -1,6 +1,7 @@
 
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 
+/** Provides functionality to allow microservices to be quickly bootstrapped. */
 module creek.service.context {
     requires transitive creek.base.type;
     requires transitive creek.service.api;

@@ -48,10 +48,32 @@ public final class SubTypeAwareMap<K, V> extends AbstractMap<Class<? extends K>,
         return types.put(key, value);
     }
 
+    /**
+     * Get the value associated with the supplied {@code key}, or the closest subtype.
+     *
+     * <p>If the map does not contain an exact match, the map is scanned for any subtypes of {@code
+     * key}. Any type in the result that has a super type in the result is removed. For example, if
+     * when looking up {@code A}, the subtype scan found {@code B} and {@code C}, and {@code C} was
+     * a subtype of {@code B}, then it would be removed from the list and the method would return
+     * {@code B}.
+     *
+     * <p>Any call that results in multiple potential subtypes will result in an exception.
+     *
+     * @param key the type to look up
+     * @return The value associated with the supplied {@code key}, is present, otherwise the closest
+     *     subtype if present, otherwise {@link Optional#empty()}.
+     */
     public Optional<V> getOrSub(final Class<? extends K> key) {
         return find(key, e -> e.getKey().isAssignableFrom(key));
     }
 
+    /**
+     * Get the value associated with the supplied {@code key}, or the closest super type.
+     *
+     * @param key the type to look up
+     * @return The value associated with the supplied {@code key}, is present, otherwise the closest
+     *     supertype if present, otherwise {@link Optional#empty()}.
+     */
     public Optional<V> getOrSuper(final Class<? extends K> key) {
         return find(key, e -> key.isAssignableFrom(e.getKey()));
     }
