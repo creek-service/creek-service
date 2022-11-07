@@ -7,6 +7,10 @@
 
 The core of the Creek system.
 
+See [CreekService.org](https://www.creekservice.org) for info on Creek Service.
+
+## Modules
+
 * **[context](context)**: Provides features to make it easier to write Kafka and Kafka Streams based microservices.
 * **[extension](extension)**: Contains base types used to implement a Creek service extension and a means of loading extensions                           
 * **[test-java-eight](test-java-eight)**: Contains functional testing extension loading *without* Java 9 modularity
