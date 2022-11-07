@@ -58,6 +58,7 @@ public interface CreekService {
      */
     ExtensionContainer extensions();
 
+    /** Provides access to component metadata. */
     interface ComponentAccessor {
 
         /**
@@ -77,6 +78,7 @@ public interface CreekService {
         ComponentDescriptorAccessor descriptors();
     }
 
+    /** Provides access to component descriptor metadata */
     interface ComponentDescriptorAccessor {
 
         /**

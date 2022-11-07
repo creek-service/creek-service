@@ -23,6 +23,15 @@ import org.creekservice.api.service.extension.CreekExtension;
 /** One-stop shop for access to Creek functionality. */
 public interface CreekContext {
 
+    /**
+     * Get the clock that services should use to determine the time.
+     *
+     * <p>Future working covered by <a
+     * href="https://github.com/creek-service/creek-system-test/issues/158">System test #158</a>
+     * will see the system tests support temporal sensitive functionality.
+     *
+     * @return the clock that services should use to determine the time. *
+     */
     Clock clock();
 
     /**

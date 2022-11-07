@@ -20,7 +20,7 @@ package org.creekservice.api.service.extension;
  * Provider of an extension to Creek.
  *
  * <p>Creek will look for extension providers using {@link java.util.ServiceLoader} to load
- * instances of this type from the class & module paths. Therefore, to be loaded by Creek the
+ * instances of this type from the class and module paths. Therefore, to be loaded by Creek the
  * extension must:
  *
  * <ul>

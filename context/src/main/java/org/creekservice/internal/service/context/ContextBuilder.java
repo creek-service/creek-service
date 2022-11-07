@@ -40,6 +40,7 @@ import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
 
+/** Implementation of {@link CreekServices.Builder} */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class ContextBuilder implements CreekServices.Builder {
 
@@ -55,6 +56,11 @@ public final class ContextBuilder implements CreekServices.Builder {
     private final ResourceInitializerFactory resourceInitializerFactory;
     private Optional<Clock> explicitClock = Optional.empty();
 
+    /**
+     * @param component the component to build a context for
+     * @param api the creek api
+     * @param extensionProviders all known extension providers
+     */
     public ContextBuilder(
             final ComponentDescriptor component,
             final Creek api,

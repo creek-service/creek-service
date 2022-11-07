@@ -23,11 +23,13 @@ import java.util.List;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.service.extension.component.ComponentDescriptorCollection;
 
+/** Implementation of {@link ComponentDescriptorCollection} */
 public final class ComponentDescriptors<T extends ComponentDescriptor>
         implements ComponentDescriptorCollection<T> {
 
     private final List<T> components;
 
+    /** @param components all known component descriptors */
     public ComponentDescriptors(final Collection<? extends T> components) {
         this.components = List.copyOf(components);
     }

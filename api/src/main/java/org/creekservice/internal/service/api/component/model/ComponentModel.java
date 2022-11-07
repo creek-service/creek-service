@@ -32,6 +32,7 @@ import org.creekservice.api.service.extension.component.model.ComponentModelCont
 import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.api.util.SubTypeAwareMap;
 
+/** Implementation of {@link ComponentModelContainer} */
 public final class ComponentModel implements ComponentModelContainer {
 
     private final long threadId;
@@ -39,6 +40,7 @@ public final class ComponentModel implements ComponentModelContainer {
     private final SubTypeAwareMap<ResourceDescriptor, ResourceExtension<?>> resourceExtensions =
             new SubTypeAwareMap<>();
 
+    /** @param extensions known extensions to Creek Service. */
     public ComponentModel(final Extensions extensions) {
         this(extensions, Thread.currentThread().getId());
     }

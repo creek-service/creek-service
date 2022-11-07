@@ -35,6 +35,9 @@ public interface ComponentModelContainer extends ComponentModelCollection {
      * org.creekservice.api.service.extension.CreekExtensionProvider#initialize}
      *
      * @param type the custom recourse type.
+     * @param handler the handler on which Creek will call back to have an extension handle a
+     *     resource
+     * @param <T> the custom resource type.
      * @return self, to allow for method chaining.
      */
     <T extends ResourceDescriptor> ComponentModelContainer addResource(
@@ -65,6 +68,9 @@ public interface ComponentModelContainer extends ComponentModelCollection {
      * }</pre>
      *
      * @param type the custom recourse type, which can contain generics.
+     * @param handler the handler on which Creek will call back to have an extension handle a
+     *     resource
+     * @param <T> the custom resource type.
      * @return self, to allow for method chaining.
      * @see ComponentModelContainer#addResource(Class, ResourceHandler)
      */
@@ -77,12 +83,15 @@ public interface ComponentModelContainer extends ComponentModelCollection {
     /**
      * A help type used by {@link #addResource(HandlerTypeRef, ResourceHandler)}.
      *
+     * @param <T> the type of the {@link ResourceDescriptor}
      * @see ComponentModelContainer#addResource(HandlerTypeRef, ResourceHandler)
      */
     @SuppressWarnings("unused")
-    class HandlerTypeRef<T extends ResourceDescriptor> {
+    abstract class HandlerTypeRef<T extends ResourceDescriptor> {
+
         private final Class<?> type;
 
+        /** Protected constructor to both subclassing */
         protected HandlerTypeRef() {
             final Type superClass = this.getClass().getGenericSuperclass();
             if (!(superClass instanceof ParameterizedType)) {
