@@ -24,6 +24,8 @@ import org.creekservice.api.service.extension.CreekService;
 public final class JavaEightExtensionProvider
         implements CreekExtensionProvider<JavaEightExtensionProvider.Extension> {
 
+    public JavaEightExtensionProvider() {}
+
     @Override
     public Extension initialize(final CreekService api) {
         return new Extension();
