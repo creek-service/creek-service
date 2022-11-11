@@ -40,7 +40,9 @@ public final class ComponentModel implements ComponentModelContainer {
     private final SubTypeAwareMap<ResourceDescriptor, ResourceExtension<?>> resourceExtensions =
             new SubTypeAwareMap<>();
 
-    /** @param extensions known extensions to Creek Service. */
+    /**
+     * @param extensions known extensions to Creek Service.
+     */
     public ComponentModel(final Extensions extensions) {
         this(extensions, Thread.currentThread().getId());
     }
