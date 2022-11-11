@@ -33,6 +33,8 @@ import org.creekservice.api.service.extension.CreekService;
 public final class JavaNineExtensionProvider2
         implements CreekExtensionProvider<JavaNineExtensionProvider2.Extension> {
 
+    public JavaNineExtensionProvider2() {}
+
     @Override
     public Extension initialize(final CreekService api) {
         api.components()
@@ -77,6 +79,8 @@ public final class JavaNineExtensionProvider2
 
         private final URI id = URI.create("java9-2:test-resource");
 
+        public Internal() {}
+
         @Override
         public URI id() {
             return id;
@@ -86,6 +90,8 @@ public final class JavaNineExtensionProvider2
     public static final class Output implements ComponentOutput {
 
         private final URI id = URI.create("java9-2:test-resource");
+
+        public Output() {}
 
         @Override
         public URI id() {

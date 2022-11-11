@@ -99,7 +99,9 @@ public interface CreekService {
          */
         ComponentDescriptorCollection<ServiceDescriptor> services();
 
-        /** @return stream of all component descriptors. */
+        /**
+         * @return stream of all component descriptors.
+         */
         default Stream<ComponentDescriptor> stream() {
             return Stream.concat(aggregates().stream(), services().stream());
         }

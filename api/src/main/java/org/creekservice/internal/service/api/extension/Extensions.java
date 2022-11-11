@@ -48,7 +48,9 @@ public final class Extensions implements ExtensionContainer {
     private final Map<Class<? extends CreekExtension>, ExtensionData<?>> extensions =
             new LinkedHashMap<>();
 
-    /** @param api the creek api */
+    /**
+     * @param api the creek api
+     */
     public Extensions(final Creek api) {
         this(api, Thread.currentThread().getId());
     }
@@ -59,7 +61,9 @@ public final class Extensions implements ExtensionContainer {
         this.api = requireNonNull(api, "api");
     }
 
-    /** @return non-empty if an extension is currently being initialized. */
+    /**
+     * @return non-empty if an extension is currently being initialized.
+     */
     public Optional<CreekExtensionProvider<?>> currentlyInitialising() {
         throwIfNotOnCorrectThread();
         return initStack.isEmpty() ? Optional.empty() : Optional.of(initStack.peek());

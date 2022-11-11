@@ -24,6 +24,8 @@ public final class JavaNineExtensionInput implements ComponentInput {
 
     private final URI id = URI.create("java9:test-resource");
 
+    public JavaNineExtensionInput() {}
+
     @Override
     public URI id() {
         return id;

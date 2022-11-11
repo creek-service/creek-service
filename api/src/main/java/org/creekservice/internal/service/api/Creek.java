@@ -41,7 +41,9 @@ public final class Creek implements CreekService {
     private final Components components;
     private final Extensions extensions;
 
-    /** @param components all known component descriptors */
+    /**
+     * @param components all known component descriptors
+     */
     public Creek(final Collection<? extends ComponentDescriptor> components) {
         this(components, new Options(), Extensions::new, ComponentModel::new);
     }

@@ -23,6 +23,8 @@ package org.creekservice.api.service.extension;
  */
 public interface CreekExtension {
 
-    /** @return the name of the extension. */
+    /**
+     * @return the name of the extension.
+     */
     String name();
 }

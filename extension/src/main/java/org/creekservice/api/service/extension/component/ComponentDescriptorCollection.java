@@ -24,7 +24,9 @@ import org.creekservice.api.platform.metadata.ComponentDescriptor;
 /** Collection of component descriptors */
 public interface ComponentDescriptorCollection<T extends ComponentDescriptor> extends Iterable<T> {
 
-    /** @return stream of the defs the collection contains. */
+    /**
+     * @return stream of the defs the collection contains.
+     */
     default Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
     }

@@ -74,7 +74,9 @@ public final class CreekServices {
          */
         Builder with(CreekExtensionOptions options);
 
-        /** @return the context the service should use. */
+        /**
+         * @return the context the service should use.
+         */
         CreekContext build();
     }
 }

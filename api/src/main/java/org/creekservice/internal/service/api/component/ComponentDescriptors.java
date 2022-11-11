@@ -29,7 +29,9 @@ public final class ComponentDescriptors<T extends ComponentDescriptor>
 
     private final List<T> components;
 
-    /** @param components all known component descriptors */
+    /**
+     * @param components all known component descriptors
+     */
     public ComponentDescriptors(final Collection<? extends T> components) {
         this.components = List.copyOf(components);
     }

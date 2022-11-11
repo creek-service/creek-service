@@ -34,7 +34,9 @@ public interface ExtensionsCollection extends Iterable<CreekExtension> {
      */
     <T extends CreekExtension> T get(Class<T> extensionType);
 
-    /** @return stream of the extensions the collection contains. */
+    /**
+     * @return stream of the extensions the collection contains.
+     */
     default Stream<CreekExtension> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
