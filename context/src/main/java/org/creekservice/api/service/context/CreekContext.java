@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.context;
 
-
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.service.extension.CreekExtension;
 

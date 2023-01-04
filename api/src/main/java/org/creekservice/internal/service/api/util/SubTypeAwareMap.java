@@ -16,7 +16,6 @@
 
 package org.creekservice.internal.service.api.util;
 
-
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;

@@ -16,7 +16,6 @@
 
 package org.creekservice.test.internal.java.nine.service.extension;
 
-
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;

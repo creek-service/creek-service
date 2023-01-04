@@ -16,7 +16,6 @@
 
 package org.creekservice.internal.service.api.options;
 
-
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Optional;

@@ -1,4 +1,3 @@
-
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 
 /** Provides functionality to allow microservices to be quickly bootstrapped. */

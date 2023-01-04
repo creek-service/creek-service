@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.extension;
 
-
 import java.util.stream.Stream;
 import org.creekservice.api.platform.metadata.AggregateDescriptor;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;

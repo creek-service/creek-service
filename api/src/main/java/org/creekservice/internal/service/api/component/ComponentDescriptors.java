@@ -16,7 +16,6 @@
 
 package org.creekservice.internal.service.api.component;
 
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
