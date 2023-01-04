@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.extension.component.model;
 
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;

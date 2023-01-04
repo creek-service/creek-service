@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.context;
 
-
 import java.util.List;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ServiceDescriptor;

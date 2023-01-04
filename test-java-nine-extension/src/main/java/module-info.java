@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionProvider2;
 import org.creekservice.test.internal.java.nine.service.extension.JavaNineExtensionProvider;

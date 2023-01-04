@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.extension.option;
 
-
 import java.util.Optional;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 

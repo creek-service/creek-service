@@ -16,7 +16,6 @@
 
 package org.creekservice.internal.service.context.temporal;
 
-
 import java.util.function.Supplier;
 import org.creekservice.api.base.type.config.SystemEnv;
 import org.creekservice.api.base.type.temporal.Clock;
