@@ -16,7 +16,6 @@
 
 package org.creekservice.test.api.java.nine.service.extension;
 
-
 import java.net.URI;
 import org.creekservice.api.platform.metadata.ComponentInput;
 

@@ -16,7 +16,6 @@
 
 package org.creekservice.test.java.eight.service.extension;
 
-
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;

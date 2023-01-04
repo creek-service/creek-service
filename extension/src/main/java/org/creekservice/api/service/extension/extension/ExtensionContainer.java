@@ -16,7 +16,6 @@
 
 package org.creekservice.api.service.extension.extension;
 
-
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 

@@ -1,4 +1,3 @@
-
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 
 /** Defines types used by Creek Service extensions */
