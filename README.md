@@ -3,6 +3,7 @@
 [![build](https://github.com/creek-service/creek-service/actions/workflows/build.yml/badge.svg)](https://github.com/creek-service/creek-service/actions/workflows/build.yml)
 [![CodeQL](https://github.com/creek-service/creek-service/actions/workflows/codeql.yml/badge.svg)](https://github.com/creek-service/creek-service/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/creek-service/creek-service/badge)](https://api.securityscorecards.dev/projects/github.com/creek-service/creek-service)
+[![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/6890/badge)](https://bestpractices.coreinfrastructure.org/projects/6890)
 
 # Creek Service
 
