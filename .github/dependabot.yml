@@ -24,3 +24,4 @@ updates:
       - maven-snapshots
       - creek-github-packages
     schedule:
+      interval: monthly
