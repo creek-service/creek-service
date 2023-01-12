@@ -8,7 +8,8 @@
 
 # Creek Service
 
-The core of the Creek system.
+The libraries published from this repository form the core of the Creek system used to implement Creek based microservices
+and extensions to Creek itself.
 
 See [CreekService.org](https://www.creekservice.org) for info on Creek Service.
 
