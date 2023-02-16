@@ -126,8 +126,8 @@ class ContextBuilderTest {
         assertThat(
                 e.getMessage(),
                 is(
-                        "No registered Creek extensions were interested in the following options: customOptions, "
-                                + "installed_extensions: provider0, provider1"));
+                        "No registered Creek extensions were interested in the following options:"
+                                + " customOptions, installed_extensions: provider0, provider1"));
     }
 
     @Test
@@ -156,9 +156,10 @@ class ContextBuilderTest {
         assertThat(
                 e.getMessage(),
                 is(
-                        "Service descriptor defines resources for which no extension is installed. "
-                                + "Are you missing a Creek extension on the class or module path? "
-                                + "component: comp, unsupported_resources: [res0], installed_extensions: provider0, provider1"));
+                        "Service descriptor defines resources for which no extension is installed."
+                                + " Are you missing a Creek extension on the class or module path?"
+                                + " component: comp, unsupported_resources: [res0],"
+                                + " installed_extensions: provider0, provider1"));
     }
 
     @Test

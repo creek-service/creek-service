@@ -137,7 +137,8 @@ class CreekServicesTest {
         assertThat(
                 e.getMessage(),
                 startsWith(
-                        "Service descriptor defines resources for which no extension is installed."));
+                        "Service descriptor defines resources for which no extension is"
+                                + " installed."));
     }
 
     @Test

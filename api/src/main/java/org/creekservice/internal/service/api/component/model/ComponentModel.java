@@ -161,7 +161,8 @@ public final class ComponentModel implements ComponentModelContainer {
 
         NotWithinInitializeException() {
             super(
-                    "The model can only be changed during the CreekExtensionProvider.initialize call");
+                    "The model can only be changed during the CreekExtensionProvider.initialize"
+                            + " call");
         }
     }
 }
