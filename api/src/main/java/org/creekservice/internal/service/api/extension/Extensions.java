@@ -190,8 +190,8 @@ public final class Extensions implements ExtensionContainer {
                 final CreekExtensionProvider<?> currentProvider,
                 final Class<? extends CreekExtensionProvider<?>> existingProvider) {
             super(
-                    "Multiple extension providers returned the same extension type. This is not supported. "
-                            + "extension_type: "
+                    "Multiple extension providers returned the same extension type. This is not"
+                            + " supported. extension_type: "
                             + type.getClass().getName()
                             + ", current_provider: "
                             + currentProvider.getClass().getName()

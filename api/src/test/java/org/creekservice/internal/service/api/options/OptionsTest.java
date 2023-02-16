@@ -73,8 +73,8 @@ class OptionsTest {
         assertThat(
                 e.getMessage(),
                 is(
-                        "Option of supplied type is already registered. "
-                                + "type: org.creekservice.internal.service.api.options.OptionsTest$TestOptionsA"));
+                        "Option of supplied type is already registered. type:"
+                            + " org.creekservice.internal.service.api.options.OptionsTest$TestOptionsA"));
     }
 
     @Test
@@ -126,7 +126,7 @@ class OptionsTest {
                 e.getMessage(),
                 is(
                         "Requested option type is ambiguous: "
-                                + "org.creekservice.internal.service.api.options.OptionsTest$BaseOptions"));
+                            + "org.creekservice.internal.service.api.options.OptionsTest$BaseOptions"));
 
         assertThat(e.getCause().getMessage(), startsWith("Ambiguous entry"));
     }

@@ -145,7 +145,8 @@ class ExtensionsTest {
         assertThat(
                 e.getMessage(),
                 containsString(
-                        "existing_provider: org.creekservice.internal.service.api.extension.ExtensionsTest$TestExtensionProvider"));
+                        "existing_provider:"
+                            + " org.creekservice.internal.service.api.extension.ExtensionsTest$TestExtensionProvider"));
     }
 
     @Test

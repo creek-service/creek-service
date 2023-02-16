@@ -89,7 +89,8 @@ class ComponentModelTest {
         assertThat(
                 e.getMessage(),
                 is(
-                        "The model can only be changed during the CreekExtensionProvider.initialize call"));
+                        "The model can only be changed during the CreekExtensionProvider.initialize"
+                                + " call"));
     }
 
     @Test
@@ -184,7 +185,7 @@ class ComponentModelTest {
                 e.getMessage(),
                 is(
                         "Unable to determine most specific resource handler for type: "
-                                + "org.creekservice.internal.service.api.component.model.ComponentModelTest$TestResource4"));
+                            + "org.creekservice.internal.service.api.component.model.ComponentModelTest$TestResource4"));
         assertThat(e.getCause().getMessage(), startsWith("Ambiguous entry."));
     }
 
@@ -203,9 +204,9 @@ class ComponentModelTest {
         assertThat(
                 e.getMessage(),
                 startsWith(
-                        "Handler already registered for type: "
-                                + "org.creekservice.internal.service.api.component.model.ComponentModelTest$BaseResource, "
-                                + "registered by: provider"));
+                        "Handler already registered for type:"
+                            + " org.creekservice.internal.service.api.component.model.ComponentModelTest$BaseResource,"
+                            + " registered by: provider"));
     }
 
     @Test
@@ -254,7 +255,8 @@ class ComponentModelTest {
                                                 "Unknown resource descriptor type: "
                                                         + TestResource.class.getName()
                                                         + lineSeparator()
-                                                        + "Are you missing a Creek extension on the class or module path?"
+                                                        + "Are you missing a Creek extension on the"
+                                                        + " class or module path?"
                                                         + lineSeparator()
                                                         + "Known resource types: ["
                                                         + lineSeparator())

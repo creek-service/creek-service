@@ -114,12 +114,12 @@ class SubTypeAwareMapTest {
         assertThat(
                 e.getMessage(),
                 is(
-                        "Ambiguous entry. Multiple entries match supplied key: "
-                                + "org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeM. "
-                                + "Could be any of ["
-                                + "org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeA, "
-                                + "org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeB"
-                                + "]"));
+                        "Ambiguous entry. Multiple entries match supplied key:"
+                            + " org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeM."
+                            + " Could be any of"
+                            + " [org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeA,"
+                            + " org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeB"
+                            + "]"));
     }
 
     @Test
@@ -136,12 +136,12 @@ class SubTypeAwareMapTest {
         assertThat(
                 e.getMessage(),
                 is(
-                        "Ambiguous entry. Multiple entries match supplied key: "
-                                + "org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyType. "
-                                + "Could be any of ["
-                                + "org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeA, "
-                                + "org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeB"
-                                + "]"));
+                        "Ambiguous entry. Multiple entries match supplied key:"
+                            + " org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyType."
+                            + " Could be any of"
+                            + " [org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeA,"
+                            + " org.creekservice.internal.service.api.util.SubTypeAwareMapTest$KeyTypeB"
+                            + "]"));
     }
 
     private interface KeyType {}
