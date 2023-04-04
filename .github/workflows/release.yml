@@ -22,7 +22,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 # v3.11.0
         with:
-          java-version: '16'
+          java-version: '17'
           distribution: 'adopt'
           cache: gradle
       - name: Ensure build is green
