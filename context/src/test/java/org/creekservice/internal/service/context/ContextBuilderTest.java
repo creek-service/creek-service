@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -55,6 +56,8 @@ import org.creekservice.internal.service.context.temporal.TestClock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
@@ -66,6 +69,8 @@ import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@Isolated // This test uses @SetEnvironmentVariable, which modifies global env
+@Execution(SAME_THREAD) // ...this isn't thread-safe. So isolate from other tests.
 class ContextBuilderTest {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
