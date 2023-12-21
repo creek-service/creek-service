@@ -140,7 +140,7 @@ public final class Extensions implements ExtensionContainer {
             final Class<? extends CreekExtensionProvider<T>> providerType) {
         try {
             return providerType.getDeclaredConstructor().newInstance();
-        } catch (final Exception e) {
+        } catch (final Exception | LinkageError e) {
             throw new FailedToInstantiateProviderException(providerType, e);
         }
     }

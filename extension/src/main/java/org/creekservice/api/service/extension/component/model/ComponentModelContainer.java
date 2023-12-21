@@ -18,8 +18,8 @@ package org.creekservice.api.service.extension.component.model;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
-import org.creekservice.api.platform.metadata.ResourceHandler;
 
 /** A mutable container of extensions to the Creek Service component model. */
 public interface ComponentModelContainer extends ComponentModelCollection {
@@ -49,15 +49,15 @@ public interface ComponentModelContainer extends ComponentModelCollection {
      * generics to raw types. The underlying registration is still by the raw class. It is therefore
      * not possible to register handlers for type refs that share the same raw class.
      *
-     * <p>It is recommended that all type parameters of the {@code type} parameter as wildcards. For
-     * example:
+     * <p>It is recommended that all type parameters of the {@code type} parameter are wildcards.
+     * For example:
      *
      * <pre>{@code
      * interface MyResource<T> {
      *     ...
      * }
      *
-     * class MyResourceHandler ResourceHandler<MyResource<?>> {
+     * class MyResourceHandler implements ResourceHandler<MyResource<?>> {
      *     ...
      * }
      *
@@ -101,6 +101,28 @@ public interface ComponentModelContainer extends ComponentModelCollection {
                 type = ((ParameterizedType) type).getRawType();
             }
             this.type = (Class<?>) type;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || !HandlerTypeRef.class.isAssignableFrom(o.getClass())) {
+                return false;
+            }
+            final HandlerTypeRef<?> that = (HandlerTypeRef<?>) o;
+            return Objects.equals(type, that.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type);
+        }
+
+        @Override
+        public String toString() {
+            return "HandlerTypeRef<" + type.getName() + ">(){}";
         }
     }
 }

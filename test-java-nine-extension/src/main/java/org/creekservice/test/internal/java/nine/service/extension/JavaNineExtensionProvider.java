@@ -19,9 +19,9 @@ package org.creekservice.test.internal.java.nine.service.extension;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
+import org.creekservice.api.service.extension.component.model.ResourceHandler;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtension;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionInput;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionOptions;
@@ -39,6 +39,9 @@ public final class JavaNineExtensionProvider implements CreekExtensionProvider<J
 
     private static final class InputHandler implements ResourceHandler<JavaNineExtensionInput> {
         @Override
-        public void ensure(final Collection<? extends JavaNineExtensionInput> resources) {}
+        public void ensure(final Collection<? extends JavaNineExtensionInput> creatableResources) {}
+
+        @Override
+        public void prepare(final Collection<? extends JavaNineExtensionInput> resources) {}
     }
 }

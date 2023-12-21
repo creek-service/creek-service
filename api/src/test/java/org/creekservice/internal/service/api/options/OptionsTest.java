@@ -17,6 +17,7 @@
 package org.creekservice.internal.service.api.options;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
@@ -109,6 +110,16 @@ class OptionsTest {
 
         // Then:
         assertThat(options.get(BaseOptions.class), is(Optional.of(userOptionsA)));
+    }
+
+    @Test
+    void shouldRemoveUnusedBySubType() {
+        // Given:
+        options.add(userOptionsA);
+        options.get(BaseOptions.class);
+
+        // Then:
+        assertThat(options.unused(), is(empty()));
     }
 
     @Test

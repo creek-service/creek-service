@@ -17,7 +17,6 @@
 package org.creekservice.api.service.extension.component.model;
 
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
-import org.creekservice.api.platform.metadata.ResourceHandler;
 
 /** A collection of extensions to the Creek Service component model: */
 public interface ComponentModelCollection {

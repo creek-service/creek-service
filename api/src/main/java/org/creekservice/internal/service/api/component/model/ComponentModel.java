@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.creekservice.api.base.annotation.VisibleForTesting;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
-import org.creekservice.api.platform.metadata.ResourceHandler;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.component.model.ComponentModelContainer;
+import org.creekservice.api.service.extension.component.model.ResourceHandler;
 import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.api.util.SubTypeAwareMap;
 

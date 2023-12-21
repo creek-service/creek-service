@@ -20,15 +20,17 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.ComponentInternal;
 import org.creekservice.api.platform.metadata.ComponentOutput;
-import org.creekservice.api.platform.metadata.ResourceHandler;
+import org.creekservice.api.platform.metadata.OwnedResource;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
+import org.creekservice.api.service.extension.component.model.ResourceHandler;
 
 public final class JavaNineExtensionProvider2
         implements CreekExtensionProvider<JavaNineExtensionProvider2.Extension> {
@@ -37,22 +39,15 @@ public final class JavaNineExtensionProvider2
 
     @Override
     public Extension initialize(final CreekService api) {
+        final Extension ext =
+                new Extension(api.components().descriptors().stream().collect(Collectors.toList()));
+
         api.components()
                 .model()
-                .addResource(Internal.class, new InternalHandler())
-                .addResource(Output.class, new OutputHandler());
+                .addResource(Internal.class, ext.internalHandler)
+                .addResource(Output.class, ext.outputHandler);
 
-        return new Extension(api.components().descriptors().stream().collect(Collectors.toList()));
-    }
-
-    private static final class InternalHandler implements ResourceHandler<Internal> {
-        @Override
-        public void ensure(final Collection<? extends Internal> resources) {}
-    }
-
-    private static final class OutputHandler implements ResourceHandler<Output> {
-        @Override
-        public void ensure(final Collection<? extends Output> resources) {}
+        return ext;
     }
 
     public static final class Extension implements CreekExtension {
@@ -60,6 +55,9 @@ public final class JavaNineExtensionProvider2
         private static final String NAME = "java9_2";
 
         private final Collection<? extends ComponentDescriptor> components;
+        private final InternalHandler internalHandler = new InternalHandler();
+        private final OutputHandler outputHandler = new OutputHandler();
+        private final LinkedHashMap<String, Object> executionOrder = new LinkedHashMap<>();
 
         public Extension(final Collection<? extends ComponentDescriptor> components) {
             this.components = requireNonNull(components, "components");
@@ -73,11 +71,35 @@ public final class JavaNineExtensionProvider2
         public Collection<? extends ComponentDescriptor> components() {
             return List.copyOf(components);
         }
+
+        public LinkedHashMap<String, Object> executionOrder() {
+            return new LinkedHashMap<>(executionOrder);
+        }
+
+        private final class InternalHandler implements ResourceHandler<Internal> {
+
+            @Override
+            public void prepare(final Collection<? extends Internal> resources) {
+                executionOrder.put("internal prepare", resources);
+            }
+        }
+
+        private final class OutputHandler implements ResourceHandler<Output> {
+            @Override
+            public void ensure(final Collection<? extends Output> creatableResources) {
+                executionOrder.put("output ensure", creatableResources);
+            }
+
+            @Override
+            public void prepare(final Collection<? extends Output> resources) {
+                executionOrder.put("output prepare", resources);
+            }
+        }
     }
 
     public static final class Internal implements ComponentInternal {
 
-        private final URI id = URI.create("java9-2:test-resource");
+        private final URI id = URI.create("java9-2:test-resource-internal");
 
         public Internal() {}
 
@@ -87,9 +109,9 @@ public final class JavaNineExtensionProvider2
         }
     }
 
-    public static final class Output implements ComponentOutput {
+    public static final class Output implements ComponentOutput, OwnedResource {
 
-        private final URI id = URI.create("java9-2:test-resource");
+        private final URI id = URI.create("java9-2:test-resource-output");
 
         public Output() {}
 
