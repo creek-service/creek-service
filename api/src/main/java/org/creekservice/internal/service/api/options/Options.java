@@ -65,9 +65,11 @@ public final class Options implements OptionContainer {
     @Override
     public <T extends CreekExtensionOptions> Optional<T> get(final Class<T> type) {
         throwIfNotOnCorrectThread();
-        unused.remove(type);
+
         try {
-            return options.getOrSuper(type).map(type::cast);
+            final Optional<T> option = options.getOrSuper(type).map(type::cast);
+            option.map(CreekExtensionOptions::getClass).ifPresent(unused::remove);
+            return option;
         } catch (final Exception e) {
             throw new IllegalArgumentException(
                     "Requested option type is ambiguous: " + type.getName(), e);
