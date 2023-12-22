@@ -26,25 +26,29 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.creekservice.api.base.type.temporal.AccurateClock;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.OwnedResource;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.resource.ResourceInitializer;
-import org.creekservice.api.platform.resource.ResourceInitializer.ResourceHandlers;
+import org.creekservice.api.platform.resource.ResourceInitializer.ResourceCreator;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
+import org.creekservice.api.service.extension.component.model.ResourceHandler;
 import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.api.component.model.ComponentModel;
 import org.creekservice.internal.service.api.extension.Extensions;
@@ -73,6 +77,9 @@ import org.mockito.quality.Strictness;
 @Execution(SAME_THREAD) // ...this isn't thread-safe. So isolate from other tests.
 class ContextBuilderTest {
 
+    private static final URI RES0_ID = URI.create("res://0");
+    private static final URI RES1_ID = URI.create("res://1");
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Creek api;
 
@@ -93,6 +100,7 @@ class ContextBuilderTest {
     @Mock private Clock specificClock;
     @Mock private ContextBuilder.ResourceInitializerFactory resourceInitializerFactory;
     @Mock private ResourceInitializer resourceInitializer;
+    @Mock private ResourceHandler<ResourceDescriptor> resourceHandler;
     @Captor private ArgumentCaptor<UncaughtExceptionHandler> exceptionHandlerCaptor;
     private ContextBuilder ctxBuilder;
 
@@ -103,6 +111,7 @@ class ContextBuilderTest {
         when(api.extensions().stream()).thenReturn(Stream.of(ext0, ext1));
 
         when(model.hasType(any())).thenReturn(true);
+        when(model.resourceHandler(any())).thenReturn(resourceHandler);
 
         when(component.name()).thenReturn("comp");
         when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
@@ -115,6 +124,9 @@ class ContextBuilderTest {
         when(ext1.name()).thenReturn("provider1");
 
         when(resourceInitializerFactory.build(any())).thenReturn(resourceInitializer);
+
+        when(res0.id()).thenReturn(RES0_ID);
+        when(res1.id()).thenReturn(RES1_ID);
 
         ctxBuilder = newContextBuilder();
     }
@@ -262,20 +274,22 @@ class ContextBuilderTest {
         // Given:
         ctxBuilder.build();
 
-        final ArgumentCaptor<ResourceHandlers> captor =
-                ArgumentCaptor.forClass(ResourceHandlers.class);
+        final ArgumentCaptor<ResourceCreator> captor =
+                ArgumentCaptor.forClass(ResourceCreator.class);
         verify(resourceInitializerFactory).build(captor.capture());
-        final ResourceHandlers handlers = captor.getValue();
+        final ResourceCreator resourceCreator = captor.getValue();
+        clearInvocations(model);
 
         // When:
-        handlers.get(ResourceA.class);
+        resourceCreator.ensure(List.of(res0));
 
         // Then:
-        verify(model).resourceHandler(ResourceA.class);
+        verify(model).resourceHandler(res0.getClass());
+        verify(resourceHandler).ensure(List.of(res0));
     }
 
     @Test
-    void shouldInitializeResources() {
+    void shouldInitializeServiceResources() {
         // When:
         ctxBuilder.build();
 
@@ -296,6 +310,55 @@ class ContextBuilderTest {
         assertThat(e, is(sameInstance(expected)));
     }
 
+    @Test
+    void shouldPrepareResources() {
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(resourceHandler).prepare(List.of(res0));
+        verify(resourceHandler).prepare(List.of(res1));
+    }
+
+    @Test
+    void shouldPrepareResourcesOncePerId() {
+        // Given:
+        when(res1.id()).thenReturn(RES0_ID);
+
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(resourceHandler).prepare(List.of(res0));
+        verify(resourceHandler, never()).prepare(List.of(res1));
+    }
+
+    @Test
+    void shouldGroupPrepareResourcesByResourceType() {
+        // Given:
+        when(res0.id()).thenReturn(RES0_ID, RES1_ID);
+        when(component.resources()).thenAnswer(inv -> Stream.of(res0, res0));
+
+        // When:
+        ctxBuilder.build();
+
+        // Then:
+        verify(resourceHandler).prepare(List.of(res0, res0));
+    }
+
+    @Test
+    void shouldThrowIfResourcePreparationFails() {
+        // Given:
+        final RuntimeException expected = new RuntimeException("boom");
+        doThrow(expected).when(resourceHandler).prepare(any());
+
+        // When:
+        final Exception e = assertThrows(RuntimeException.class, ctxBuilder::build);
+
+        // Then:
+        assertThat(e, is(expected));
+    }
+
     private ContextBuilder newContextBuilder() {
         return new ContextBuilder(
                 component,
@@ -311,7 +374,7 @@ class ContextBuilderTest {
 
     private interface TestExtensionB extends CreekExtension {}
 
-    private interface ResourceA extends ResourceDescriptor {}
+    private interface ResourceA extends ResourceDescriptor, OwnedResource {}
 
     private interface ResourceB extends ResourceDescriptor {}
 }

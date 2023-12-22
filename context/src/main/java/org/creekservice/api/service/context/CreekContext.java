@@ -20,7 +20,7 @@ import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.service.extension.CreekExtension;
 
 /** One-stop shop for access to Creek functionality. */
-public interface CreekContext {
+public interface CreekContext extends AutoCloseable {
 
     /**
      * Get the clock that services should use to determine the time.
@@ -42,4 +42,7 @@ public interface CreekContext {
      * @throws IllegalArgumentException if not installed.
      */
     <T extends CreekExtension> T extension(Class<T> extensionType);
+
+    /** Close all resources held by Creek. */
+    void close();
 }

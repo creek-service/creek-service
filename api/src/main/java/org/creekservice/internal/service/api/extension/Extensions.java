@@ -130,6 +130,13 @@ public final class Extensions implements ExtensionContainer {
                                                 extensionType, extensions.values()));
     }
 
+    /** Close all extensions. */
+    public void close() {
+        throwIfNotOnCorrectThread();
+
+        extensions.values().stream().map(ed -> ed.extension).forEach(CreekExtension::close);
+    }
+
     private void throwIfNotOnCorrectThread() {
         if (Thread.currentThread().getId() != threadId) {
             throw new ConcurrentModificationException("Class is not thread safe");
@@ -140,7 +147,7 @@ public final class Extensions implements ExtensionContainer {
             final Class<? extends CreekExtensionProvider<T>> providerType) {
         try {
             return providerType.getDeclaredConstructor().newInstance();
-        } catch (final Exception e) {
+        } catch (final Exception | LinkageError e) {
             throw new FailedToInstantiateProviderException(providerType, e);
         }
     }

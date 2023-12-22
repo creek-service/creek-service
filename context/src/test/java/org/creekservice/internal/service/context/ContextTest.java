@@ -19,11 +19,12 @@ package org.creekservice.internal.service.context;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.service.extension.CreekExtension;
-import org.creekservice.api.service.extension.extension.ExtensionsCollection;
+import org.creekservice.internal.service.api.extension.Extensions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,7 @@ class ContextTest {
 
     @Mock private Clock clock;
     @Mock private TestExtension ext;
-    @Mock private ExtensionsCollection extensions;
+    @Mock private Extensions extensions;
     private Context ctx;
 
     @BeforeEach
@@ -61,6 +62,15 @@ class ContextTest {
 
         // Then:
         assertThat(result, is(ext));
+    }
+
+    @Test
+    void shouldCloseExtensionsOnClose() {
+        // When:
+        ctx.close();
+
+        // Then:
+        verify(extensions).close();
     }
 
     private interface TestExtension extends CreekExtension {}

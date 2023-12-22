@@ -17,9 +17,13 @@
 package org.creekservice.internal.service.context;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.groupingBy;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URI;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,13 +33,15 @@ import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.observability.logging.structured.StructuredLogger;
 import org.creekservice.api.observability.logging.structured.StructuredLoggerFactory;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.OwnedResource;
+import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.resource.ResourceInitializer;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
-import org.creekservice.api.service.extension.extension.ExtensionsCollection;
+import org.creekservice.api.service.extension.component.model.ResourceHandler;
 import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
@@ -114,13 +120,14 @@ public final class ContextBuilder implements CreekServices.Builder {
         installDefaultUncaughtExceptionHandler();
 
         initializeExtensions();
-        final CreekContext ctx = contextFactory.build(createClock(), api.extensions());
         throwOnUnsupportedResourceType();
         throwOnUnusedOptionType();
 
         resourceInitializer().service(List.of(component));
 
-        return ctx;
+        prepareExtensions();
+
+        return contextFactory.build(createClock(), api.extensions());
     }
 
     private void installDefaultUncaughtExceptionHandler() {
@@ -177,7 +184,39 @@ public final class ContextBuilder implements CreekServices.Builder {
     }
 
     private ResourceInitializer resourceInitializer() {
-        return resourceInitializerFactory.build(api.components().model()::resourceHandler);
+        return resourceInitializerFactory.build(
+                new ResourceInitializer.ResourceCreator() {
+                    @SuppressWarnings({"unchecked", "rawtypes"})
+                    @Override
+                    public <T extends ResourceDescriptor & OwnedResource> void ensure(
+                            final Collection<T> creatableResources) {
+                        api.components()
+                                .model()
+                                .resourceHandler(creatableResources.iterator().next().getClass())
+                                .ensure((Collection) creatableResources);
+                    }
+                });
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void prepareExtensions() {
+        final Map<URI, ResourceDescriptor> uniqueById =
+                component
+                        .resources()
+                        .collect(
+                                groupingBy(
+                                        ResourceDescriptor::id,
+                                        Collectors.collectingAndThen(
+                                                Collectors.toList(), l -> l.get(0))));
+
+        final Map<Class<? extends ResourceDescriptor>, List<ResourceDescriptor>> byType =
+                uniqueById.values().stream().collect(groupingBy(ResourceDescriptor::getClass));
+
+        byType.forEach(
+                (type, resources) -> {
+                    final ResourceHandler handler = api.components().model().resourceHandler(type);
+                    handler.prepare(resources);
+                });
     }
 
     private String installedExtensions() {
@@ -207,12 +246,12 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ContextFactory {
-        CreekContext build(Clock clock, ExtensionsCollection extensions);
+        CreekContext build(Clock clock, Extensions extensions);
     }
 
     @VisibleForTesting
     interface ResourceInitializerFactory {
-        ResourceInitializer build(ResourceInitializer.ResourceHandlers handlers);
+        ResourceInitializer build(ResourceInitializer.ResourceCreator resourceCreator);
     }
 
     @VisibleForTesting

@@ -27,7 +27,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.creekservice.api.base.type.temporal.AccurateClock;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.platform.metadata.ComponentInput;
@@ -94,6 +96,26 @@ class CreekServicesTest {
         final JavaNineExtensionProvider2.Extension ext =
                 ctx.extension(JavaNineExtensionProvider2.Extension.class);
         assertThat(ext.components(), is(List.of(serviceDescriptor)));
+    }
+
+    @Test
+    void shouldEnsureResourcesBeforePrepare() {
+        // Given
+        when(serviceDescriptor.outputs()).thenReturn(List.of(java9Output));
+
+        // When:
+        final CreekContext ctx = CreekServices.context(serviceDescriptor);
+
+        // Then:
+        final LinkedHashMap<String, Object> executionOrder =
+                ctx.extension(JavaNineExtensionProvider2.Extension.class).executionOrder();
+
+        final List<String> outputOrder =
+                executionOrder.keySet().stream()
+                        .filter(k -> k.startsWith("output "))
+                        .collect(Collectors.toList());
+
+        assertThat(outputOrder, is(List.of("output ensure", "output prepare")));
     }
 
     @Test
