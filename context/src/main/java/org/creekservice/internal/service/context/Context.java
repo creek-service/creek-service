@@ -21,14 +21,14 @@ import static java.util.Objects.requireNonNull;
 import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
-import org.creekservice.api.service.extension.extension.ExtensionsCollection;
+import org.creekservice.internal.service.api.extension.Extensions;
 
 final class Context implements CreekContext {
 
     private final Clock clock;
-    private final ExtensionsCollection extensions;
+    private final Extensions extensions;
 
-    Context(final Clock clock, final ExtensionsCollection extensions) {
+    Context(final Clock clock, final Extensions extensions) {
         this.clock = requireNonNull(clock, "clock");
         this.extensions = requireNonNull(extensions, "extensions");
     }
@@ -41,5 +41,10 @@ final class Context implements CreekContext {
     @Override
     public <T extends CreekExtension> T extension(final Class<T> extensionType) {
         return extensions.get(extensionType);
+    }
+
+    @Override
+    public void close() {
+        extensions.close();
     }
 }
