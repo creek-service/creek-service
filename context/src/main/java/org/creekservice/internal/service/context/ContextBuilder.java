@@ -42,7 +42,6 @@ import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.component.model.ResourceHandler;
-import org.creekservice.api.service.extension.extension.ExtensionsCollection;
 import org.creekservice.internal.service.api.Creek;
 import org.creekservice.internal.service.api.extension.Extensions;
 import org.creekservice.internal.service.context.temporal.SystemEnvClockLoader;
@@ -247,7 +246,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ContextFactory {
-        CreekContext build(Clock clock, ExtensionsCollection extensions);
+        CreekContext build(Clock clock, Extensions extensions);
     }
 
     @VisibleForTesting

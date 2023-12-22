@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mockito.quality.Strictness.LENIENT;
@@ -284,6 +285,19 @@ class ExtensionsTest {
                                 + TestExtensionProvider.class.getName()));
     }
 
+    @Test
+    void shouldCloseExtensionsOnClose() {
+        // Given:
+        final TestExtension ext = mock(TestExtension.class);
+        extensions.ensureExtension(new TestExtensionProvider(ext));
+
+        // When:
+        extensions.close();
+
+        // Then:
+        verify(ext).close();
+    }
+
     @ParameterizedTest(name = "[" + INDEX_PLACEHOLDER + "] {0}")
     @MethodSource("publicMethods")
     void shouldThrowIfWrongThread(final String ignored, final Consumer<Extensions> method) {
@@ -325,7 +339,8 @@ class ExtensionsTest {
                 Arguments.of("stream", (Consumer<Extensions>) Extensions::stream),
                 Arguments.of(
                         "forEach", (Consumer<Extensions>) m -> m.forEach(mock(Consumer.class))),
-                Arguments.of("get", (Consumer<Extensions>) m -> m.get(TestExtension.class)));
+                Arguments.of("get", (Consumer<Extensions>) m -> m.get(TestExtension.class)),
+                Arguments.of("close", (Consumer<Extensions>) Extensions::close));
     }
 
     private static List<String> testedMethodNames() {

@@ -27,4 +27,7 @@ public interface CreekExtension {
      * @return the name of the extension.
      */
     String name();
+
+    /** Close the extension, releasing any resources the extension holds. */
+    default void close() {}
 }
