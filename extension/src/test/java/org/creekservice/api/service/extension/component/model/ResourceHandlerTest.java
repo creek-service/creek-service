@@ -43,6 +43,10 @@ class ResourceHandlerTest {
     private interface TestResource extends ResourceDescriptor {}
 
     private static final class TestResourceHandler implements ResourceHandler<TestResource> {
+
+        @Override
+        public void validate(final Collection<? extends TestResource> resources) {}
+
         @Override
         public void prepare(final Collection<? extends TestResource> resources) {}
     }
