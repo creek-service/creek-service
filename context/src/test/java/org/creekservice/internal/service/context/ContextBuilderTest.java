@@ -43,7 +43,6 @@ import org.creekservice.api.platform.metadata.ComponentDescriptor;
 import org.creekservice.api.platform.metadata.OwnedResource;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.resource.ResourceInitializer;
-import org.creekservice.api.platform.resource.ResourceInitializer.ResourceCreator;
 import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
@@ -71,6 +70,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@SuppressWarnings("resource")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 @Isolated // This test uses @SetEnvironmentVariable, which modifies global env
@@ -269,19 +269,30 @@ class ContextBuilderTest {
         verify(contextFactory).build(isA(TestClock.class), any());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    void shouldCreateResourceInitializerWithCorrectParams() {
+    void shouldValidateResourcesOnCallback() {
         // Given:
         ctxBuilder.build();
-
-        final ArgumentCaptor<ResourceCreator> captor =
-                ArgumentCaptor.forClass(ResourceCreator.class);
-        verify(resourceInitializerFactory).build(captor.capture());
-        final ResourceCreator resourceCreator = captor.getValue();
-        clearInvocations(model);
+        final ResourceInitializer.Callbacks callbacks = captureCallbacks();
 
         // When:
-        resourceCreator.ensure(List.of(res0));
+        callbacks.validate((Class<ResourceA>) res0.getClass(), List.of(res0));
+
+        // Then:
+        verify(model).resourceHandler(res0.getClass());
+        verify(resourceHandler).validate(List.of(res0));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void shouldEnsureResourcesOnCallback() {
+        // Given:
+        ctxBuilder.build();
+        final ResourceInitializer.Callbacks callbacks = captureCallbacks();
+
+        // When:
+        callbacks.ensure((Class<ResourceA>) res0.getClass(), List.of(res0));
 
         // Then:
         verify(model).resourceHandler(res0.getClass());
@@ -357,6 +368,15 @@ class ContextBuilderTest {
 
         // Then:
         assertThat(e, is(expected));
+    }
+
+    private ResourceInitializer.Callbacks captureCallbacks() {
+        final ArgumentCaptor<ResourceInitializer.Callbacks> captor =
+                ArgumentCaptor.forClass(ResourceInitializer.Callbacks.class);
+        verify(resourceInitializerFactory).build(captor.capture());
+        final ResourceInitializer.Callbacks callbacks = captor.getValue();
+        clearInvocations(model);
+        return callbacks;
     }
 
     private ContextBuilder newContextBuilder() {

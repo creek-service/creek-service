@@ -38,7 +38,6 @@ import org.creekservice.api.service.context.CreekContext;
 import org.creekservice.api.service.context.CreekServices;
 import org.creekservice.api.service.extension.CreekExtensionOptions;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtension;
-import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionInput;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionOptions;
 import org.creekservice.test.api.java.nine.service.extension.JavaNineExtensionProvider2;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,12 +48,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@SuppressWarnings("resource")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class CreekServicesTest {
 
     @Mock private ServiceDescriptor serviceDescriptor;
-    private final JavaNineExtensionInput java9Input = new JavaNineExtensionInput();
+    private final JavaNineExtensionProvider2.Input java9Input =
+            new JavaNineExtensionProvider2.Input();
     private final JavaNineExtensionProvider2.Internal java9Internal =
             new JavaNineExtensionProvider2.Internal();
     private final JavaNineExtensionProvider2.Output java9Output =
@@ -99,7 +100,7 @@ class CreekServicesTest {
     }
 
     @Test
-    void shouldEnsureResourcesBeforePrepare() {
+    void shouldValidateAndEnsureOwnedResourcesBeforePrepare() {
         // Given
         when(serviceDescriptor.outputs()).thenReturn(List.of(java9Output));
 
@@ -115,7 +116,47 @@ class CreekServicesTest {
                         .filter(k -> k.startsWith("output "))
                         .collect(Collectors.toList());
 
-        assertThat(outputOrder, is(List.of("output ensure", "output prepare")));
+        assertThat(outputOrder, is(List.of("output validate", "output ensure", "output prepare")));
+    }
+
+    @Test
+    void shouldValidateUnownedResourcesBeforePrepare() {
+        // Given
+        when(serviceDescriptor.inputs()).thenReturn(List.of(java9Input));
+
+        // When:
+        final CreekContext ctx = CreekServices.context(serviceDescriptor);
+
+        // Then:
+        final LinkedHashMap<String, Object> executionOrder =
+                ctx.extension(JavaNineExtensionProvider2.Extension.class).executionOrder();
+
+        final List<String> outputOrder =
+                executionOrder.keySet().stream()
+                        .filter(k -> k.startsWith("input "))
+                        .collect(Collectors.toList());
+
+        assertThat(outputOrder, is(List.of("input validate", "input prepare")));
+    }
+
+    @Test
+    void shouldValidateUnmanagedResourcesBeforePrepare() {
+        // Given
+        when(serviceDescriptor.internals()).thenReturn(List.of(java9Internal));
+
+        // When:
+        final CreekContext ctx = CreekServices.context(serviceDescriptor);
+
+        // Then:
+        final LinkedHashMap<String, Object> executionOrder =
+                ctx.extension(JavaNineExtensionProvider2.Extension.class).executionOrder();
+
+        final List<String> outputOrder =
+                executionOrder.keySet().stream()
+                        .filter(k -> k.startsWith("internal "))
+                        .collect(Collectors.toList());
+
+        assertThat(outputOrder, is(List.of("internal validate", "internal prepare")));
     }
 
     @Test

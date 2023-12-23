@@ -27,6 +27,19 @@ import org.creekservice.api.platform.metadata.ResourceDescriptor;
 public interface ResourceHandler<T extends ResourceDescriptor> {
 
     /**
+     * Validate that all the supplied {@code resources} consistently represent the same resource.
+     *
+     * <p>There is often multiple resource descriptors describing the same resource present in the
+     * system. For example, both input and output descriptors for the same resource. Any
+     * inconsistencies in the details of the resource between these descriptors can lead to bugs.
+     *
+     * @param resources the set of resources that all share the same {@link
+     *     ResourceDescriptor#id()}.
+     * @throws RuntimeException with the details of any inconsistencies.
+     */
+    void validate(Collection<? extends T> resources);
+
+    /**
      * Ensure the supplied external {@code creatableResources} exist.
      *
      * <p>Instructs an extension to ensure the resources described by the supplied descriptor exist

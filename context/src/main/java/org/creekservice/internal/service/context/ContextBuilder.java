@@ -185,15 +185,17 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     private ResourceInitializer resourceInitializer() {
         return resourceInitializerFactory.build(
-                new ResourceInitializer.ResourceCreator() {
-                    @SuppressWarnings({"unchecked", "rawtypes"})
+                new ResourceInitializer.Callbacks() {
+                    @Override
+                    public <T extends ResourceDescriptor> void validate(
+                            final Class<T> type, final Collection<T> resourceGroup) {
+                        api.components().model().resourceHandler(type).validate(resourceGroup);
+                    }
+
                     @Override
                     public <T extends ResourceDescriptor & OwnedResource> void ensure(
-                            final Collection<T> creatableResources) {
-                        api.components()
-                                .model()
-                                .resourceHandler(creatableResources.iterator().next().getClass())
-                                .ensure((Collection) creatableResources);
+                            final Class<T> type, final Collection<T> creatableResources) {
+                        api.components().model().resourceHandler(type).ensure(creatableResources);
                     }
                 });
     }
@@ -251,7 +253,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     @VisibleForTesting
     interface ResourceInitializerFactory {
-        ResourceInitializer build(ResourceInitializer.ResourceCreator resourceCreator);
+        ResourceInitializer build(ResourceInitializer.Callbacks callbacks);
     }
 
     @VisibleForTesting

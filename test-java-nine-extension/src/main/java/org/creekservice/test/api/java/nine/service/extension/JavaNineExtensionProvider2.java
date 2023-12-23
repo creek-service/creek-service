@@ -24,9 +24,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
+import org.creekservice.api.platform.metadata.ComponentInput;
 import org.creekservice.api.platform.metadata.ComponentInternal;
 import org.creekservice.api.platform.metadata.ComponentOutput;
 import org.creekservice.api.platform.metadata.OwnedResource;
+import org.creekservice.api.platform.metadata.UnownedResource;
 import org.creekservice.api.service.extension.CreekExtension;
 import org.creekservice.api.service.extension.CreekExtensionProvider;
 import org.creekservice.api.service.extension.CreekService;
@@ -44,6 +46,7 @@ public final class JavaNineExtensionProvider2
 
         api.components()
                 .model()
+                .addResource(Input.class, ext.inputHandler)
                 .addResource(Internal.class, ext.internalHandler)
                 .addResource(Output.class, ext.outputHandler);
 
@@ -55,6 +58,7 @@ public final class JavaNineExtensionProvider2
         private static final String NAME = "java9_2";
 
         private final Collection<? extends ComponentDescriptor> components;
+        private final InputHandler inputHandler = new InputHandler();
         private final InternalHandler internalHandler = new InternalHandler();
         private final OutputHandler outputHandler = new OutputHandler();
         private final LinkedHashMap<String, Object> executionOrder = new LinkedHashMap<>();
@@ -76,7 +80,25 @@ public final class JavaNineExtensionProvider2
             return new LinkedHashMap<>(executionOrder);
         }
 
+        private final class InputHandler implements ResourceHandler<Input> {
+
+            @Override
+            public void validate(final Collection<? extends Input> resources) {
+                executionOrder.put("input validate", resources);
+            }
+
+            @Override
+            public void prepare(final Collection<? extends Input> resources) {
+                executionOrder.put("input prepare", resources);
+            }
+        }
+
         private final class InternalHandler implements ResourceHandler<Internal> {
+
+            @Override
+            public void validate(final Collection<? extends Internal> resources) {
+                executionOrder.put("internal validate", resources);
+            }
 
             @Override
             public void prepare(final Collection<? extends Internal> resources) {
@@ -86,6 +108,11 @@ public final class JavaNineExtensionProvider2
 
         private final class OutputHandler implements ResourceHandler<Output> {
             @Override
+            public void validate(final Collection<? extends Output> resources) {
+                executionOrder.put("output validate", resources);
+            }
+
+            @Override
             public void ensure(final Collection<? extends Output> creatableResources) {
                 executionOrder.put("output ensure", creatableResources);
             }
@@ -94,6 +121,18 @@ public final class JavaNineExtensionProvider2
             public void prepare(final Collection<? extends Output> resources) {
                 executionOrder.put("output prepare", resources);
             }
+        }
+    }
+
+    public static final class Input implements ComponentInput, UnownedResource {
+
+        private final URI id = URI.create("java9-2:test-resource-input");
+
+        public Input() {}
+
+        @Override
+        public URI id() {
+            return id;
         }
     }
 
