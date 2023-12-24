@@ -115,6 +115,11 @@ public interface ComponentModelContainer extends ComponentModelCollection {
             return Objects.equals(type, that.type);
         }
 
+        // To avoid spotbugs CT_CONSTRUCTOR_THROW.
+        @SuppressWarnings("deprecation")
+        @Override
+        protected final void finalize() {}
+
         @Override
         public int hashCode() {
             return Objects.hash(type);
