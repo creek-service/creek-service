@@ -45,7 +45,7 @@ class ResourceHandlerTest {
     private static final class TestResourceHandler implements ResourceHandler<TestResource> {
 
         @Override
-        public void validate(final Collection<? extends TestResource> resources) {}
+        public void validate(final Collection<? extends TestResource> resourceGroup) {}
 
         @Override
         public void prepare(final Collection<? extends TestResource> resources) {}

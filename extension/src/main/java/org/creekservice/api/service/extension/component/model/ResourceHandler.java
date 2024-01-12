@@ -27,17 +27,18 @@ import org.creekservice.api.platform.metadata.ResourceDescriptor;
 public interface ResourceHandler<T extends ResourceDescriptor> {
 
     /**
-     * Validate that all the supplied {@code resources} consistently represent the same resource.
+     * Validate that all the supplied {@code resourceGroup} consistently represent the same
+     * resource.
      *
      * <p>There is often multiple resource descriptors describing the same resource present in the
      * system. For example, both input and output descriptors for the same resource. Any
      * inconsistencies in the details of the resource between these descriptors can lead to bugs.
      *
-     * @param resources the set of resources that all share the same {@link
+     * @param resourceGroup the set of resources that all share the same {@link
      *     ResourceDescriptor#id()}.
      * @throws RuntimeException with the details of any inconsistencies.
      */
-    void validate(Collection<? extends T> resources);
+    void validate(Collection<? extends T> resourceGroup);
 
     /**
      * Ensure the supplied external {@code creatableResources} exist.
@@ -49,7 +50,8 @@ public interface ResourceHandler<T extends ResourceDescriptor> {
      * exists, but does not match the expected configuration.
      *
      * @param creatableResources the resource instances to ensure exists and are initialized.
-     *     Resources passed will be {@link ResourceDescriptor#isCreatable creatable}.
+     *     Resources passed will be {@link org.creekservice.api.platform.metadata.CreatableResource
+     *     creatable}.
      */
     default void ensure(Collection<? extends T> creatableResources) {
         throw new UnsupportedOperationException("Not a handler of owned resources");
