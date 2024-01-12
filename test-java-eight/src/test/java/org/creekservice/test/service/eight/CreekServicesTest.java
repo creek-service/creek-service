@@ -113,10 +113,20 @@ class CreekServicesTest {
 
         final List<String> outputOrder =
                 executionOrder.keySet().stream()
-                        .filter(k -> k.startsWith("output "))
+                        .filter(k -> k.startsWith("output ") || k.startsWith("inner "))
                         .collect(Collectors.toList());
 
-        assertThat(outputOrder, is(List.of("output validate", "output ensure", "output prepare")));
+        // Prepare doesn't have guaranteed order:
+        assertThat(
+                outputOrder,
+                is(
+                        List.of(
+                                "inner validate",
+                                "output validate",
+                                "inner ensure",
+                                "output ensure",
+                                "inner prepare",
+                                "output prepare")));
     }
 
     @Test

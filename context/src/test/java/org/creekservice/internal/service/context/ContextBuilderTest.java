@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,7 +66,9 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -114,7 +117,8 @@ class ContextBuilderTest {
         when(model.resourceHandler(any())).thenReturn(resourceHandler);
 
         when(component.name()).thenReturn("comp");
-        when(component.resources()).thenAnswer(inv -> Stream.of(res0, res1));
+        when(component.resources()).thenAnswer(inv -> Stream.of(res0));
+        when(res0.resources()).thenAnswer(inv -> Stream.of(res1));
         when(contextFactory.build(any(), any())).thenReturn(ctx);
 
         when(extProvider0.initialize(any())).thenReturn(ext0);
@@ -190,7 +194,7 @@ class ContextBuilderTest {
                 assertThrows(UnsupportedResourceTypesException.class, ctxBuilder::build);
 
         // Then:
-        assertThat(e.getMessage(), containsString("unsupported_resources: [res0, res1]"));
+        assertThat(e.getMessage(), containsString("unsupported_resources: [res1, res0]"));
     }
 
     @Test
@@ -322,13 +326,14 @@ class ContextBuilderTest {
     }
 
     @Test
-    void shouldPrepareResources() {
+    void shouldPrepareNestedResourcesFirst() {
         // When:
         ctxBuilder.build();
 
         // Then:
-        verify(resourceHandler).prepare(List.of(res0));
-        verify(resourceHandler).prepare(List.of(res1));
+        final InOrder inOrder = Mockito.inOrder(resourceHandler);
+        inOrder.verify(resourceHandler).prepare(List.of(res1));
+        inOrder.verify(resourceHandler).prepare(List.of(res0));
     }
 
     @Test
@@ -340,21 +345,23 @@ class ContextBuilderTest {
         ctxBuilder.build();
 
         // Then:
-        verify(resourceHandler).prepare(List.of(res0));
-        verify(resourceHandler, never()).prepare(List.of(res1));
+        verify(resourceHandler).prepare(List.of(res1));
+        verify(resourceHandler, never()).prepare(List.of(res0));
     }
 
     @Test
     void shouldGroupPrepareResourcesByResourceType() {
         // Given:
-        when(res0.id()).thenReturn(RES0_ID, RES1_ID);
-        when(component.resources()).thenAnswer(inv -> Stream.of(res0, res0));
+        final ResourceA res2 = mock(ResourceA.class);
+        when(res2.id()).thenReturn(RES1_ID);
+        when(component.resources()).thenAnswer(inv -> Stream.of(res0, res2));
+        when(res0.resources()).thenAnswer(inv -> Stream.of());
 
         // When:
         ctxBuilder.build();
 
         // Then:
-        verify(resourceHandler).prepare(List.of(res0, res0));
+        verify(resourceHandler).prepare(List.of(res0, res2));
     }
 
     @Test

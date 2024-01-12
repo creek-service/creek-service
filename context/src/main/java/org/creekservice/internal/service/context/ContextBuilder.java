@@ -17,11 +17,14 @@
 package org.creekservice.internal.service.context;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URI;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +36,8 @@ import org.creekservice.api.base.type.temporal.Clock;
 import org.creekservice.api.observability.logging.structured.StructuredLogger;
 import org.creekservice.api.observability.logging.structured.StructuredLoggerFactory;
 import org.creekservice.api.platform.metadata.ComponentDescriptor;
-import org.creekservice.api.platform.metadata.OwnedResource;
+import org.creekservice.api.platform.metadata.CreatableResource;
+import org.creekservice.api.platform.metadata.ResourceCollection;
 import org.creekservice.api.platform.metadata.ResourceDescriptor;
 import org.creekservice.api.platform.resource.ResourceInitializer;
 import org.creekservice.api.service.context.CreekContext;
@@ -144,8 +148,7 @@ public final class ContextBuilder implements CreekServices.Builder {
 
     private void throwOnUnsupportedResourceType() {
         final List<Object> unsupported =
-                component
-                        .resources()
+                ResourceCollection.collectResources(component)
                         .filter(
                                 resourceDef ->
                                         !api.components().model().hasType(resourceDef.getClass()))
@@ -193,7 +196,7 @@ public final class ContextBuilder implements CreekServices.Builder {
                     }
 
                     @Override
-                    public <T extends ResourceDescriptor & OwnedResource> void ensure(
+                    public <T extends CreatableResource> void ensure(
                             final Class<T> type, final Collection<T> creatableResources) {
                         api.components().model().resourceHandler(type).ensure(creatableResources);
                     }
@@ -203,16 +206,20 @@ public final class ContextBuilder implements CreekServices.Builder {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void prepareExtensions() {
         final Map<URI, ResourceDescriptor> uniqueById =
-                component
-                        .resources()
+                ResourceCollection.collectResources(component)
                         .collect(
                                 groupingBy(
                                         ResourceDescriptor::id,
-                                        Collectors.collectingAndThen(
-                                                Collectors.toList(), l -> l.get(0))));
+                                        LinkedHashMap::new,
+                                        collectingAndThen(toList(), l -> l.get(0))));
 
         final Map<Class<? extends ResourceDescriptor>, List<ResourceDescriptor>> byType =
-                uniqueById.values().stream().collect(groupingBy(ResourceDescriptor::getClass));
+                uniqueById.values().stream()
+                        .collect(
+                                groupingBy(
+                                        ResourceDescriptor::getClass,
+                                        LinkedHashMap::new,
+                                        toList()));
 
         byType.forEach(
                 (type, resources) -> {
