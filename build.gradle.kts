@@ -53,7 +53,7 @@ subprojects {
 
     extra.apply {
         set("creekVersion", "0.4.2-SNAPSHOT")
-        set("spotBugsVersion", "4.8.5")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+        set("spotBugsVersion", "4.8.6")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 
         set("log4jVersion", "2.23.1")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
         set("guavaVersion", "33.2.1-jre")         // https://mvnrepository.com/artifact/com.google.guava/guava
