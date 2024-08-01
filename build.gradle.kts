@@ -60,7 +60,7 @@ subprojects {
         set("junitVersion", "5.10.2")            // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
         set("junitPioneerVersion", "2.2.0")     // https://mvnrepository.com/artifact/org.junit-pioneer/junit-pioneer
         set("mockitoVersion", "5.12.0")          // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-        set("hamcrestVersion", "2.2")           // https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core
+        set("hamcrestVersion", "3.0")           // https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core
     }
 
     val creekVersion : String by extra
