@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Creek Contributors (https://github.com/creek-service)
+ * Copyright 2022-2025 Creek Contributors (https://github.com/creek-service)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -420,7 +420,7 @@ class ExtensionsTest {
 
     public interface UncreatableProvider extends CreekExtensionProvider<TestExtension> {}
 
-    private static class PrivateExtensionImpl implements TestExtension {
+    private static final class PrivateExtensionImpl implements TestExtension {
         @Override
         public String name() {
             return "test";
