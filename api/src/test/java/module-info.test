@@ -1,8 +1,8 @@
 --add-modules
-  org.junitpioneer,org.hamcrest,guava.testlib,creek.test.util,creek.test.hamcrest,creek.test.conformity
+  org.junitpioneer,org.mockito.junit.jupiter,org.hamcrest,com.google.common.testlib,creek.test.util,creek.test.hamcrest,creek.test.conformity
 
 --add-reads
-  creek.service.api=org.junitpioneer,org.hamcrest,guava.testlib,creek.test.util,creek.test.hamcrest,creek.test.conformity
+  creek.service.api=org.junitpioneer,org.mockito.junit.jupiter,org.hamcrest,com.google.common.testlib,creek.test.util,creek.test.hamcrest,creek.test.conformity
 
 --add-exports
   creek.service.api/org.creekservice.internal.service.context.temporal=creek.base.type
