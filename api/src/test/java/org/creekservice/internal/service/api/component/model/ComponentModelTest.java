@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Creek Contributors (https://github.com/creek-service)
+ * Copyright 2022-2025 Creek Contributors (https://github.com/creek-service)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -373,16 +373,16 @@ class ComponentModelTest {
     }
 
     /** ResourceDescriptor - BaseResource - TestResource - TestResource2 */
-    private static class TestResource2 extends TestResource {}
+    private static final class TestResource2 extends TestResource {}
 
     /**
      * /- BaseResource - TestResource -\ ResourceDescriptor -| |- TestResource3 \--------
      * BaseResource ---------\
      */
-    private static class TestResource3 extends TestResource implements BaseResource {}
+    private static final class TestResource3 extends TestResource implements BaseResource {}
 
     /** /- BaseResource -\ ResourceDescriptor -| |- TestResource4 \- BaseResource2 -\ */
-    private static class TestResource4 implements BaseResource, BaseResource2 {
+    private static final class TestResource4 implements BaseResource, BaseResource2 {
 
         @Override
         public URI id() {
