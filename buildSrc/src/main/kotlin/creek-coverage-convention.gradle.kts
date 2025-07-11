@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Creek Contributors (https://github.com/creek-service)
+ * Copyright 2022-2025 Creek Contributors (https://github.com/creek-service)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 /**
  * Standard coverage configuration of Creek projects, utilising Jacoco and Coveralls.io
  *
- * <p>Version: 1.2
- *
- * <p>Apply to root project only
+ * <p>Versions:
+ *  - 1.3: remove deprecated use of $buildDir
+ *  - 1.2: Apply to root project only
  */
 
 plugins {
@@ -64,7 +64,7 @@ val coverage = tasks.register<JacocoReport>("coverage") {
 
 coveralls {
     sourceDirs = allprojects.flatMap{it.sourceSets.main.get().allSource.srcDirs}.map{it.toString()}
-    jacocoReportPath = "$buildDir/reports/jacoco/coverage/coverage.xml"
+    jacocoReportPath = layout.buildDirectory.file("reports/jacoco/coverage/coverage.xml")
 }
 
 tasks.coveralls {
