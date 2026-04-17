@@ -180,6 +180,8 @@ public final class JavaNineExtensionProvider2
 
         private final URI id = URI.create("java9-2:test-resource-output");
 
+        public Output() {}
+
         @Override
         public URI id() {
             return id;
