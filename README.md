@@ -21,3 +21,4 @@ See [CreekService.org](https://www.creekservice.org) for info on Creek Service.
 * **[test-java-nine](test-java-nine)**: Contains functional testing extension loading *with* Java 9 modularity
 * **[test-java-eight-extension](test-java-eight-extension)**: Contains a test-only service extension *without* Java 9 module info
 * **[test-java-nine-extension](test-java-nine-extension)**: Contains a test-only service extension *with* Java 9 module info
+
