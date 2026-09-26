@@ -19,7 +19,7 @@ plugins {
 }
 
 val creekVersion : String by extra
-val spotBugsVersion : String by extra
+val spotBugsVersion : String by project
 
 dependencies {
     api(project(":extension"))
