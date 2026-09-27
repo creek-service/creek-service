@@ -19,12 +19,11 @@ plugins {
 }
 
 val creekVersion : String by extra
-val spotBugsVersion = project.property("spotBugsVersion") as String
 
 dependencies {
     api(project(":extension"))
     api("org.creekservice:creek-base-annotation:$creekVersion")
 
     implementation("org.creekservice:creek-base-type:$creekVersion")
-    implementation("com.github.spotbugs:spotbugs-annotations:$spotBugsVersion")
+    implementation("com.github.spotbugs:spotbugs-annotations:${property("spotBugsVersion")}")
 }
