@@ -41,38 +41,26 @@ allprojects {
 subprojects {
     project.version = project.parent?.version!!
 
-    apply(plugin = "creek-common-convention")
-    apply(plugin = "creek-module-convention")
+    pluginManager.apply("creek-common-convention")
+    pluginManager.apply("creek-module-convention")
 
     if (name.startsWith("test-")) {
         tasks.javadoc { onlyIf { false } }
     } else {
-        apply(plugin = "creek-publishing-convention")
+        pluginManager.apply("creek-publishing-convention")
     }
 
     if (name != "test-java-eight-extension"
         && name != "test-java-nine-extension"
     ) {
-        apply(plugin = "jacoco")
+        pluginManager.apply("jacoco")
     }
 
-    extra.apply {
-        set("creekVersion", project.version)
-        set("spotBugsVersion", "4.10.4")         // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+    extra.apply { set("creekVersion", project.version) }
 
-        set("log4jVersion", "2.26.1")           // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-        set("guavaVersion", "33.7.1-jre")         // https://mvnrepository.com/artifact/com.google.guava/guava
-        set("junitVersion", "6.1.3")            // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-        set("junitPioneerVersion", "2.3.0")     // https://mvnrepository.com/artifact/org.junit-pioneer/junit-pioneer
-        set("mockitoVersion", "5.23.0")          // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    }
-
-    val creekVersion : String by extra
-    val guavaVersion : String by extra
-    val log4jVersion : String by extra
-    val junitVersion: String by extra
-    val junitPioneerVersion: String by extra
-    val mockitoVersion: String by extra
+    val creekVersion = property("creekVersion") as String
+    val log4jVersion = property("log4jVersion") as String
+    val junitVersion = property("junitVersion") as String
 
     dependencies {
         testImplementation("org.creekservice:creek-test-hamcrest:$creekVersion")
@@ -80,9 +68,9 @@ subprojects {
         testImplementation("org.creekservice:creek-test-conformity:$creekVersion")
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
         testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-        testImplementation("org.junit-pioneer:junit-pioneer:$junitPioneerVersion")
-        testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
-        testImplementation("com.google.guava:guava-testlib:$guavaVersion")
+        testImplementation("org.junit-pioneer:junit-pioneer:${property("junitPioneerVersion")}")
+        testImplementation("org.mockito:mockito-junit-jupiter:${property("mockitoVersion")}")
+        testImplementation("com.google.guava:guava-testlib:${property("guavaVersion")}")
         testImplementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
         testImplementation("org.apache.logging.log4j:log4j-slf4j2-impl:$log4jVersion")
         testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
