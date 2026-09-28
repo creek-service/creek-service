@@ -58,7 +58,7 @@ subprojects {
 
     extra.apply { set("creekVersion", project.version) }
 
-    val creekVersion : String by extra
+    val creekVersion = property("creekVersion") as String
     val log4jVersion = property("log4jVersion") as String
     val junitVersion = property("junitVersion") as String
 

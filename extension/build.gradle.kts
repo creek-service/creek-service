@@ -18,7 +18,7 @@ plugins {
     `java-library`
 }
 
-val creekVersion : String by extra
+val creekVersion = property("creekVersion") as String
 
 dependencies {
     api("org.creekservice:creek-platform-metadata:$creekVersion")
